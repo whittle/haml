@@ -75,7 +75,7 @@ module Sass
     private
 
     def build_tree
-      root = Tree::Node.new({})
+      root = Tree::Node.new
       whitespace
       rules              root
       expand_commas      root
@@ -99,7 +99,7 @@ module Sass
       directive = rule[0] == ?@
 
       if directive
-        node = Tree::DirectiveNode.new(rule, {})
+        node = Tree::DirectiveNode.new(rule)
         return node if @template.scan(/;/)
 
         assert_match /\{/
@@ -110,7 +110,7 @@ module Sass
       end
 
       assert_match /\{/
-      node = Tree::RuleNode.new(rule, {})
+      node = Tree::RuleNode.new(rule)
       attributes(node)
       return node
     end
@@ -128,7 +128,7 @@ module Sass
         end
 
         assert_match /(;|(?=\}))/
-        rule << Tree::AttrNode.new(name, value, {})
+        rule << Tree::AttrNode.new(name, value, nil)
       end
 
       assert_match /\}/
@@ -176,7 +176,7 @@ module Sass
       root.children.map! do |child|
         next child unless Tree::RuleNode === child && child.rules.first.include?(',')
         child.rules.first.split(',').map do |rule|
-          node = Tree::RuleNode.new(rule.strip, {})
+          node = Tree::RuleNode.new(rule.strip)
           node.children = child.children
           node
         end
@@ -224,7 +224,7 @@ module Sass
         first, rest = child.rules.first.scan(/^(&?(?: .|[^ ])[^.#: \[]*)([.#: \[].*)?$/).first
 
         if current_rule.nil? || current_rule.rules.first != first
-          current_rule = Tree::RuleNode.new(first, {})
+          current_rule = Tree::RuleNode.new(first)
           root << current_rule
         end
 

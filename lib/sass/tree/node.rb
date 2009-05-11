@@ -3,12 +3,20 @@ module Sass
     class Node
       attr_accessor :children
       attr_accessor :line
-      attr_accessor :filename
+      attr_writer :filename
+      attr_reader :options
 
-      def initialize(options)
-        @options = options
-        @style = options[:style]
+      def initialize
         @children = []
+      end
+
+      def options=(options)
+        children.each {|c| c.options = options}
+        @options = options
+      end
+
+      def filename
+        @filename || @options[:filename]
       end
 
       def <<(child)
@@ -27,6 +35,10 @@ module Sass
         self.class == other.class && other.children == children
       end
 
+      def render
+        perform(Environment.new).to_s
+      end
+
       def invisible?; false; end
 
       def to_s
@@ -37,17 +49,21 @@ module Sass
           else
             next if child.invisible?
             child_str = child.to_s(1)
-            result << child_str + (@style == :compressed ? '' : "\n")
+            result << child_str + (style == :compressed ? '' : "\n")
           end
         end
-        @style == :compressed ? result+"\n" : result[0...-1]
+        style == :compressed ? result+"\n" : result[0...-1]
+      rescue Sass::SyntaxError => e; e.add_metadata(filename, line)
       end
 
       def perform(environment)
+        environment.options = @options if self.class == Tree::Node
         _perform(environment)
-      rescue Sass::SyntaxError => e
-        e.sass_line ||= line
-        raise e
+      rescue Sass::SyntaxError => e; e.add_metadata(filename, line)
+      end
+
+      def style
+        @options[:style]
       end
 
       protected
