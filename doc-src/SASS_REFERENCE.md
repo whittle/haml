@@ -21,9 +21,9 @@ for creating manageable stylesheets.
 ## Using Sass
 
 Sass can be used in three ways:
-as a plugin for Ruby on Rails,
+as a command-line tool,
 as a standalone Ruby module,
-and as a command-line tool.
+and as a plugin for Ruby on Rails or Merb.
 Sass is bundled with Haml,
 so if the Haml plugin or RubyGem is installed,
 Sass will already be installed as a plugin or gem, respectively.
@@ -31,8 +31,27 @@ The first step for all of these is to install the Haml gem:
 
     gem install haml
 
-To enable it as a Rails plugin,
-then run
+To run Sass from the command line, just use
+
+    sass input.sass output.css
+
+Use `sass --help` for full documentation.
+At the moment, the command-line tool doesn't support
+updating everything in a directory
+or automatically updating the CSS file when the Sass file changes.
+To do that, check out the [Compass](http://compass-style.org/) Sass framework.
+
+Using Sass in Ruby code is very simple.
+After installing the Haml gem,
+you can use it by running `require "sass"`
+and using Sass::Engine like so:
+
+    engine = Sass::Engine.new("#main\n  :background-color #0000ff")
+    engine.render #=> "#main { background-color: #0000ff; }\n"
+
+### Rails/Merb Plugin
+
+To enable Sass as a Rails plugin, run
 
     haml --rails path/to/rails/app
 
@@ -51,19 +70,126 @@ By default (see options, below),
 Then, whenever necessary, they're compiled into corresponding CSS files in public/stylesheets.
 For instance, public/stylesheets/sass/main.sass would be compiled to public/stylesheets/main.css.
 
-To run Sass from the command line, just use
+### Caching
 
-    sass input.sass output.css
+By default, Sass caches compiled templates and [partials](#partials).
+This dramatically speeds up re-compilation of large collections of Sass files,
+and works best if the Sass templates are split up into separate files
+that are all [`@import`](#import)ed into one large file.
 
-Use `sass --help` for full documentation.
+Without a framework, Sass puts the cached templates in the `.sass-cache` directory.
+In Rails and Merb, they go in `tmp/sass-cache`.
+The directory can be customized with the [`:cache_location`](#cache_location-option) option.
+If you don't want Sass to use caching at all,
+set the [`:cache`](#cache-option) option to `false`.
 
-Using Sass in Ruby code is very simple.
-After installing the Haml gem,
-you can use it by running `require "sass"`
-and using Sass::Engine like so:
+### Options
 
-    engine = Sass::Engine.new("#main\n  :background-color #0000ff")
-    engine.render #=> "#main { background-color: #0000ff; }\n"
+Options can be set by setting the {Sass::Plugin#options Sass::Plugin.options} hash
+in `environment.rb` in Rails...
+
+    Sass::Plugin.options[:style] = :compact
+
+...or by setting the `Merb::Plugin.config[:sass]` hash in `init.rb` in Merb...
+
+    Merb::Plugin.config[:sass][:style] = :compact
+
+...or by passing an options hash to {Sass::Engine#initialize}.
+Available options are:
+
+{#style-option} `:style`
+: Sets the style of the CSS output.
+  See the section on Output Style, above.
+
+{#attribute_syntax-option} `:attribute_syntax`
+: Forces the document to use one syntax for attributes.
+  If the correct syntax isn't used, an error is thrown.
+  `:normal` forces the use of a colon
+  before the attribute name.
+  For example: `:color #0f3`
+  or `:width = !main_width`.
+  `:alternate` forces the use of a colon or equals sign
+  after the attribute name.
+  For example: `color: #0f3`
+  or `width = !main_width`.
+  By default, either syntax is valid.
+
+{#cache-option} `cache`
+: Whether parsed Sass files should be cached,
+  allowing greater speed. Defaults to true.
+
+{#never_update-option} `:never_update`
+: Whether the CSS files should never be updated,
+  even if the template file changes.
+  Setting this to true may give small performance gains.
+  It always defaults to false.
+  Only has meaning within Ruby on Rails or Merb.
+
+{#always_update-option} `:always_update`
+: Whether the CSS files should be updated every
+  time a controller is accessed,
+  as opposed to only when the template has been modified.
+  Defaults to false.
+  Only has meaning within Ruby on Rails or Merb.
+
+{#always_check-option} `:always_check`
+: Whether a Sass template should be checked for updates every
+  time a controller is accessed,
+  as opposed to only when the Rails server starts.
+  If a Sass template has been updated,
+  it will be recompiled and will overwrite the corresponding CSS file.
+  Defaults to false in production mode, true otherwise.
+  Only has meaning within Ruby on Rails or Merb.
+
+{#full_exception-option} `:full_exception`
+: Whether an error in the Sass code
+  should cause Sass to provide a detailed description.
+  If set to true, the specific error will be displayed
+  along with a line number and source snippet.
+  Otherwise, a simple uninformative error message will be displayed.
+  Defaults to false in production mode, true otherwise.
+  Only has meaning within Ruby on Rails or Merb.
+
+{#template-location-option} `:template_location`
+: A path to the root sass template directory for you application.
+  If a hash, `:css_location` is ignored and this option designates
+  both a mapping between input and output directories.
+  May also be given a list of 2-element lists, instead of a hash.
+  Defaults to `RAILS_ROOT + "/public/stylesheets/sass"`
+  or `MERB_ROOT + "/public/stylesheets/sass"`.
+  Only has meaning within Ruby on Rails or Merb.
+  This will be derived from the `:css_location` path list if not provided 
+  by appending a folder of "sass" to each corresponding css location.
+
+{#css-location-option} `:css_location`
+: The path where CSS output should be written to.
+  This option is ignored when `:template_location` is a Hash.
+  Defaults to `RAILS_ROOT + "/public/stylesheets"`
+  or `MERB_ROOT + "/public/stylesheets"`.
+  Only has meaning within Ruby on Rails or Merb.
+
+{#cache_location-option} `:cache_location`
+: The path where the cached `sassc` files should be written to.
+  Defaults to `RAILS_ROOT + "/tmp/sass-cache"`,
+  or `MERB_ROOT + "/tmp/sass-cache"`,
+  or just `"./.sass-cache"`.
+
+{#filename-option} `:filename`
+: The filename of the file being rendered.
+  This is used solely for reporting errors,
+  and is automatically set when using Rails or Merb.
+
+{#load_paths-option} `:load_paths`
+: An array of filesystem paths which should be searched
+  for Sass templates imported with the [`@import`](#import) directive.
+  This defaults to the working directory and, in Rails or Merb,
+  whatever `:template_location` is.
+
+{#line_numbers-option} `:line_numbers`
+: When set to true, causes the line number and file
+  where a selector is defined to be emitted into the compiled CSS
+  as a comment. Useful for debugging especially when using imports
+  and mixins.
 
 ## CSS Rules
 
@@ -184,7 +310,7 @@ is compiled to:
       #main pre {
         font-size: 3em; }
 
-### Referencing Parent Rules
+### Referencing Parent Rules: `&`
 
 In addition to the default behavior of inserting the parent selector
 as a CSS parent of the current selector
@@ -260,7 +386,7 @@ is compiled to:
       font-size: 30em;
       font-weight: bold; }
 
-### Rule Escaping
+### Rule Escaping: `\`
 
 In case, for whatever reason, you need to write a rule
 that begins with a Sass-meaningful character,
@@ -291,12 +417,11 @@ Some directives can also control whether or how many times
 a chunk of Sass is output.
 Those are documented under Control Structures.
 
-### `@import`
+### `@import` {#import}
 
-The `@import` directive works in a very similar way to the CSS import directive,
-and sometimes compiles to a literal CSS `@import`.
-
-Sass can import either other Sass files or plain CSS files.
+The `@import` directive works in a very similar way to the CSS import directive.
+It can either compile to a literal CSS `@import` directive for a CSS file,
+or it can import a Sass file.
 If it imports a Sass file,
 not only are the rules from that file included,
 but all variables in that file are made available in the current file.
@@ -304,15 +429,9 @@ but all variables in that file are made available in the current file.
 Sass looks for other Sass files in the working directory,
 and the Sass file directory under Rails or Merb.
 Additional search directories may be specified
-using the `:load_paths` option (see below).
+using the [`:load_paths`](#load_paths-option) option.
 
-Sass can also import plain CSS files.
-In this case, it doesn't literally include the content of the files;
-rather, it uses the built-in CSS `@import` directive to tell the client program
-to import the files.
-
-The import directive can take either a full filename
-or a filename without an extension.
+`@import` takes a filename with or without an extension.
 If an extension isn't provided,
 Sass will try to find a Sass file with the given basename in the load paths,
 and, failing that, will assume a relevant CSS file will be available.
@@ -339,7 +458,21 @@ Finally,
     @import foo
 
 might compile to either,
-depending on whether a file called "foo.sass" existed.
+depending on whether or not a file called "foo.sass" existed.
+
+#### Partials {#partials}
+
+If you have a Sass file that you want to import
+but don't want to compile to a CSS file,
+you can add an underscore to the beginning of the filename.
+This will tell Sass not to compile it to a normal CSS file.
+You can then refer to these files without using the underscore.
+
+For example, you might have `_colors.sass`.
+Then no `_colors.css` file would be created,
+and you can do
+
+    @import colors.sass
 
 ### `@debug`
 
@@ -388,6 +521,103 @@ compiles to:
       #main {
         background-color: white; } }
 
+## Control Structures
+
+SassScript supports basic control structures for looping and conditionals
+using the same syntax as directives.
+
+### `@if`
+
+The `@if` statement takes a SassScript expression
+and prints the code nested beneath it if the expression returns
+anything other than `false`:
+
+    p
+      @if 1 + 1 == 2
+        :border 1px solid
+      @if 5 < 3
+        :border 2px dotted
+
+is compiled to:
+
+    p {
+      border: 1px solid; }
+
+The `@if` statement can be followed by several `@else if` statements
+and one `@else` statement.
+If the `@if` statement fails,
+the `@else if` statements are tried in order
+until one succeeds or the `@else` is reached.
+For example:
+
+    !type = "monster"
+    p
+      @if !type == "ocean"
+        :color blue
+      @else if !type == "matador"
+        :color red
+      @else if !type == "monster"
+        :color green
+      @else
+        :color black
+
+is compiled to:
+
+    p {
+      color: green; }
+
+### `@for`
+
+The `@for` statement has two forms:
+`@for <var> from <start> to <end>` or
+`@for <var> from <start> through <end>`.
+`<var>` is a variable name, like `!i`,
+and `<start>` and `<end>` are SassScript expressions
+that should return integers.
+
+The `@for` statement sets `<var>` to each number
+from `<start>` to `<end>`,
+including `<end>` if `through` is used.
+For example:
+
+    @for !i from 1 through 3
+      .item-#{!i}
+        :width = 2em * !i
+
+is compiled to:
+
+    .item-1 {
+      width: 2em; }
+    .item-2 {
+      width: 4em; }
+    .item-3 {
+      width: 6em; }
+
+### `@while`
+
+The `@while` statement repeatedly loops over the nested
+block until the statement evaluates to `false`. This can
+be used to achieve more complex looping than the `@for`
+statement is capable of.
+For example:
+
+    !i = 6
+    @while !i > 0
+      .item-#{!i}
+        :width = 2em * !i
+      !i = !i - 2
+
+is compiled to:
+
+    .item-6 {
+      width: 12em; }
+
+    .item-4 {
+      width: 8em; }
+
+    .item-2 {
+      width: 4em; }
+
 ## SassScript
 
 In addition to the declarative templating system,
@@ -412,7 +642,7 @@ and the result printed out for you:
     >> #777 + #888
     white
 
-### Variables
+### Variables: `!`
 
 The most straightforward way to use SassScript
 is to set and reference variables.
@@ -547,7 +777,7 @@ You can define additional functions in ruby.
 
 See {Sass::Script::Functions} for more information.
 
-### Interpolation
+### Interpolation: `#{}`
 
 You can also use SassScript variables in selectors
 and attribute names using #{} interpolation syntax:
@@ -555,14 +785,14 @@ and attribute names using #{} interpolation syntax:
     !name = foo
     !attr = border
     p.#{!name}
-      #{attr}-color: blue
+      #{!attr}-color: blue
 
 is compiled to:
 
     p.foo {
       border-color: blue; }
 
-### Optional Assignment
+### Optional Assignment: `||=`
 
 You can assign to variables if they aren't already assigned
 using the `||=` assignment operator. This means that if the
@@ -585,103 +815,6 @@ is compiled to:
       content: First content;
       new-content: First time reference; }
 
-## Control Structures
-
-SassScript supports basic control structures for looping and conditionals
-using the same syntax as directives.
-
-### `@if`
-
-The `@if` statement takes a SassScript expression
-and prints the code nested beneath it if the expression returns
-anything other than `false`:
-
-    p
-      @if 1 + 1 == 2
-        :border 1px solid
-      @if 5 < 3
-        :border 2px dotted
-
-is compiled to:
-
-    p {
-      border: 1px solid; }
-
-The `@if` statement can be followed by several `@else if` statements
-and one `@else` statement.
-If the `@if` statement fails,
-the `@else if` statements are tried in order
-until one succeeds or the `@else` is reached.
-For example:
-
-    !type = "monster"
-    p
-      @if !type == "ocean"
-        :color blue
-      @else if !type == "matador"
-        :color red
-      @else if !type == "monster"
-        :color green
-      @else
-        :color black
-
-is compiled to:
-
-    p {
-      color: green; }
-
-### `@for`
-
-The `@for` statement has two forms:
-`@for <var> from <start> to <end>` or
-`@for <var> from <start> through <end>`.
-`<var>` is a variable name, like `!i`,
-and `<start>` and `<end>` are SassScript expressions
-that should return integers.
-
-The `@for` statement sets `<var>` to each number
-from `<start>` to `<end>`,
-including `<end>` if `through` is used.
-For example:
-
-    @for !i from 1 through 3
-      .item-#{!i}
-        :width = 2em * !i
-
-is compiled to:
-
-    .item-1 {
-      width: 2em; }
-    .item-2 {
-      width: 4em; }
-    .item-3 {
-      width: 6em; }
-
-### `@while`
-
-The `@while` statement repeatedly loops over the nested
-block until the statement evaluates to `false`. This can
-be used to achieve more complex looping than the `@for`
-statement is capable of.
-For example:
-
-    !i = 6
-    @while !i > 0
-      .item-#{!i}
-        :width = 2em * !i
-      !i = !i - 2
-
-is compiled to:
-
-    .item-6 {
-      width: 12em; }
-
-    .item-4 {
-      width: 8em; }
-
-    .item-2 {
-      width: 4em; }
-
 ## Mixins
 
 Mixins enable you to define groups of CSS attributes and
@@ -690,7 +823,7 @@ throughout the document. This allows you to keep your
 stylesheets DRY and also avoid placing presentation
 classes in your markup.
 
-### Defining a Mixin
+### Defining a Mixin: `=`
 
 To define a mixin you use a slightly modified form of selector syntax.
 For example the `large-text` mixin is defined as follows:
@@ -719,7 +852,7 @@ For example:
       * html &
         height: 1px
 
-### Mixing it in
+### Mixing It In: `+`
 
 Inlining a defined mixin is simple,
 just prepend a `+` symbol to the name of a mixin defined earlier in the document.
@@ -800,41 +933,11 @@ is compiled to:
 
 ## Comments
 
-### Silent Comments
+Sass supports two sorts of comments:
+those that show up in the CSS output
+and those that don't.
 
-It's simple to add "silent" comments,
-which don't output anything to the CSS document,
-to a Sass document.
-Simply use the familiar C-style notation for a one-line comment, `//`,
-at the normal indentation level and all text following it won't be output.
-For example:
-
-    // A very awesome rule.
-    #awesome.rule
-      // An equally awesome attribute.
-      :awesomeness very
-
-becomes
-
-    #awesome.rule {
-      awesomeness: very; }
-
-You can also nest text beneath a comment to comment out a whole block.
-For example:
-
-    // A very awesome rule
-    #awesome.rule
-      // Don't use these attributes
-        color: green
-        font-size: 10em
-      color: red
-
-becomes
-
-    #awesome.rule {
-      color: red; }
-
-### Loud Comments
+### CSS Comments: `/*`
 
 "Loud" comments are just as easy as silent ones.
 These comments output to the document as CSS comments,
@@ -871,6 +974,40 @@ becomes
        * that represents
        * a peanut butter and jelly sandwich. */
       background-image: url(/images/pbj.png);
+      color: red; }
+
+### Sass Comments: `//`
+
+It's simple to add "silent" comments,
+which don't output anything to the CSS document,
+to a Sass document.
+Simply use the familiar C-style notation for a one-line comment, `//`,
+at the normal indentation level and all text following it won't be output.
+For example:
+
+    // A very awesome rule.
+    #awesome.rule
+      // An equally awesome attribute.
+      :awesomeness very
+
+becomes
+
+    #awesome.rule {
+      awesomeness: very; }
+
+You can also nest text beneath a comment to comment out a whole block.
+For example:
+
+    // A very awesome rule
+    #awesome.rule
+      // Don't use these attributes
+        color: green
+        font-size: 10em
+      color: red
+
+becomes
+
+    #awesome.rule {
       color: red; }
 
 ## Output Style
@@ -957,111 +1094,3 @@ It's not meant to be human-readable.
 For example:
 
     #main{color:#fff;background-color:#000}#main p{width:10em}.huge{font-size:10em;font-weight:bold;text-decoration:underline}
-
-## Sass Options
-
-Options can be set by setting the {Sass::Plugin#options Sass::Plugin.options} hash
-in `environment.rb` in Rails...
-
-    Sass::Plugin.options[:style] = :compact
-
-...or by setting the `Merb::Plugin.config[:sass]` hash in `init.rb` in Merb...
-
-    Merb::Plugin.config[:sass][:style] = :compact
-
-...or by passing an options hash to {Sass::Engine#initialize}.
-Available options are:
-
-{#style-option} `:style`
-: Sets the style of the CSS output.
-  See the section on Output Style, above.
-
-{#attribute_syntax-option} `:attribute_syntax`
-: Forces the document to use one syntax for attributes.
-  If the correct syntax isn't used, an error is thrown.
-  `:normal` forces the use of a colon
-  before the attribute name.
-  For example: `:color #0f3`
-  or `:width = !main_width`.
-  `:alternate` forces the use of a colon or equals sign
-  after the attribute name.
-  For example: `color: #0f3`
-  or `width = !main_width`.
-  By default, either syntax is valid.
-
-{#cache-option} `cache`
-: Whether parsed Sass files should be cached,
-  allowing greater speed. Defaults to true.
-
-{#never_update-option} `:never_update`
-: Whether the CSS files should never be updated,
-  even if the template file changes.
-  Setting this to true may give small performance gains.
-  It always defaults to false.
-  Only has meaning within Ruby on Rails or Merb.
-
-{#always_update-option} `:always_update`
-: Whether the CSS files should be updated every
-  time a controller is accessed,
-  as opposed to only when the template has been modified.
-  Defaults to false.
-  Only has meaning within Ruby on Rails or Merb.
-
-{#always_check-option} `:always_check`
-: Whether a Sass template should be checked for updates every
-  time a controller is accessed,
-  as opposed to only when the Rails server starts.
-  If a Sass template has been updated,
-  it will be recompiled and will overwrite the corresponding CSS file.
-  Defaults to false in production mode, true otherwise.
-  Only has meaning within Ruby on Rails or Merb.
-
-{#full_exception-option} `:full_exception`
-: Whether an error in the Sass code
-  should cause Sass to provide a detailed description.
-  If set to true, the specific error will be displayed
-  along with a line number and source snippet.
-  Otherwise, a simple uninformative error message will be displayed.
-  Defaults to false in production mode, true otherwise.
-  Only has meaning within Ruby on Rails or Merb.
-
-{#template-location-option} `:template_location`
-: A path to the root sass template directory for you application.
-  If a hash, `:css_location` is ignored and this option designates
-  both a mapping between input and output directories.
-  May also be given a list of 2-element lists, instead of a hash.
-  Defaults to `RAILS_ROOT + "/public/stylesheets/sass"`
-  or `MERB_ROOT + "/public/stylesheets/sass"`.
-  Only has meaning within Ruby on Rails or Merb.
-  This will be derived from the `:css_location` path list if not provided 
-  by appending a folder of "sass" to each corresponding css location.
-
-{#css-location-option} `:css_location`
-: The path where CSS output should be written to.
-  This option is ignored when `:template_location` is a Hash.
-  Defaults to `RAILS_ROOT + "/public/stylesheets"`
-  or `MERB_ROOT + "/public/stylesheets"`.
-  Only has meaning within Ruby on Rails or Merb.
-
-{#cache_location-option} `:cache_location`
-: The path where the cached `sassc` files should be written to.
-  Defaults to `RAILS_ROOT + "/tmp/sass-cache"`,
-  or `MERB_ROOT + "/tmp/sass-cache"`,
-  or just `"./.sass-cache"`.
-
-{#filename-option} `:filename`
-: The filename of the file being rendered.
-  This is used solely for reporting errors,
-  and is automatically set when using Rails or Merb.
-
-{#load_paths-option} `:load_paths`
-: An array of filesystem paths which should be searched
-  for Sass templates imported with the "@import" directive.
-  This defaults to the working directory and, in Rails or Merb,
-  whatever `:template_location` is.
-
-{#line_numbers-option} `:line_numbers`
-: When set to true, causes the line number and file
-  where a selector is defined to be emitted into the compiled CSS
-  as a comment. Useful for debugging especially when using imports
-  and mixins.
