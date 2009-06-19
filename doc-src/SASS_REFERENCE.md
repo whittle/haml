@@ -46,7 +46,7 @@ After installing the Haml gem,
 you can use it by running `require "sass"`
 and using Sass::Engine like so:
 
-    engine = Sass::Engine.new("#main\n  :background-color #0000ff")
+    engine = Sass::Engine.new("#main\n  background-color: #0000ff")
     engine.render #=> "#main { background-color: #0000ff; }\n"
 
 ### Rails/Merb Plugin
@@ -65,8 +65,8 @@ to config/dependencies.rb.
 Sass templates in Rails don't quite function in the same way as views,
 because they don't contain dynamic content,
 and so only need to be compiled when the template file has been updated.
-By default (see options, below),
-".sass" files are placed in public/stylesheets/sass.
+By default, ".sass" files are placed in public/stylesheets/sass
+(this can be customized with the [`:template_location`](#template_location-option) option).
 Then, whenever necessary, they're compiled into corresponding CSS files in public/stylesheets.
 For instance, public/stylesheets/sass/main.sass would be compiled to public/stylesheets/main.css.
 
@@ -101,17 +101,17 @@ Available options are:
 : Sets the style of the CSS output.
   See the section on Output Style, above.
 
-{#attribute_syntax-option} `:attribute_syntax`
-: Forces the document to use one syntax for attributes.
+{#property_syntax-option} `:property_syntax`
+: Forces the document to use one syntax for properties.
   If the correct syntax isn't used, an error is thrown.
-  `:normal` forces the use of a colon
-  before the attribute name.
-  For example: `:color #0f3`
-  or `:width = !main_width`.
-  `:alternate` forces the use of a colon or equals sign
-  after the attribute name.
+  `:new` forces the use of a colon or equals sign
+  after the property name.
   For example: `color: #0f3`
   or `width = !main_width`.
+  `:old` forces the use of a colon
+  before the property name.
+  For example: `:color #0f3`
+  or `:width = !main_width`.
   By default, either syntax is valid.
 
 {#cache-option} `cache`
@@ -194,11 +194,8 @@ Available options are:
 ## CSS Rules
 
 Rules in flat CSS have two elements:
-the selector
-(e.g. `#main`, `div p`, `li a:hover`)
-and the attributes
-(e.g. `color: #00ff00;`, `width: 5em;`).
-
+the selector (e.g. `#main`, `div p`, `li a:hover`)
+and the properties (e.g. `color: #00ff00;`, `width: 5em;`).
 Sass has both of these,
 as well as one additional element: nested rules.
 
@@ -206,31 +203,31 @@ as well as one additional element: nested rules.
 
 However, some of the syntax is a little different.
 The syntax for selectors is the same,
-but instead of using brackets to delineate the attributes that belong to a particular rule,
+but instead of using brackets to delineate the properties that belong to a particular rule,
 Sass uses indentation.
 For example:
 
     #main p
-      <attribute>
-      <attribute>
+      <property>
+      <property>
       ...
 
-Like CSS, you can stretch rules over multiple lines.
+Like CSS, you can stretch selectors over multiple lines.
 However, unlike CSS, you can only do this if each line but the last
 ends with a comma.
 For example:
 
     .users #userTab,
     .posts #postsTab
-      <attributes>
+      <property>
 
-### Attributes
+### Properties
 
-There are two different ways to write CSS attrbibutes.
+There are two different ways to write CSS properties.
 The first is very similar to the how you're used to writing them:
 with a colon between the name and the value.
-However, Sass attributes don't have semicolons at the end;
-each attribute is on its own line, so they aren't necessary.
+However, Sass properties don't have semicolons at the end;
+each property is on its own line, so they aren't necessary.
 For example:
 
     #main p
@@ -243,10 +240,10 @@ is compiled to:
       color: #00ff00;
       width: 97% }
 
-The second syntax for attributes is slightly different.
-The colon is at the beginning of the attribute,
+The second syntax for properties is slightly different.
+The colon is at the beginning of the property,
 rather than between the name and the value,
-so it's easier to tell what elements are attributes just by glancing at them.
+so it's easier to tell what elements are properties just by glancing at them.
 For example:
 
     #main p
@@ -259,9 +256,9 @@ is compiled to:
       color: #00ff00;
       width: 97% }
 
-By default, either attribute syntax may be used.
+By default, either property syntax may be used.
 If you want to force one or the other,
-see the `:attribute_syntax` option below.
+see the [`:property_syntax`](#property_syntax-option) option.
 
 ### Nested Rules
 
@@ -270,12 +267,12 @@ This signifies that the inner rule's selector is a child of the outer selector.
 For example:
 
     #main p
-      :color #00ff00
-      :width 97%
+      color: #00ff00
+      width: 97%
 
       .redbox
-        :background-color #ff0000
-        :color #000000
+        background-color: #ff0000
+        color: #000000
 
 is compiled to:
 
@@ -289,15 +286,15 @@ is compiled to:
 This makes insanely complicated CSS layouts with lots of nested selectors very simple:
 
     #main
-      :width 97%
+      width: 97%
 
       p, div
-        :font-size 2em
+        font-size: 2em
         a
-          :font-weight bold
+          font-weight: bold
 
       pre
-        :font-size 3em
+        font-size: 3em
 
 is compiled to:
 
@@ -310,7 +307,7 @@ is compiled to:
       #main pre {
         font-size: 3em; }
 
-### Referencing Parent Rules: `&`
+### Referencing Parent Selectors: `&`
 
 In addition to the default behavior of inserting the parent selector
 as a CSS parent of the current selector
@@ -320,15 +317,15 @@ by using the ampersand character `&` in your selectors.
 
 The ampersand is automatically replaced by the parent selector,
 instead of having it prepended.
-This allows you to cleanly create pseudo-attributes:
+This allows you to cleanly create pseudo-classes:
 
     a
-      :font-weight bold
-      :text-decoration none
+      font-weight: bold
+      text-decoration: none
       &:hover
-        :text-decoration underline
+        text-decoration: underline
       &:visited
-        :font-weight normal
+        font-weight: normal
 
 Which would become:
 
@@ -344,12 +341,12 @@ It also allows you to add selectors at the base of the hierarchy,
 which can be useuful for targeting certain styles to certain browsers:
 
     #main
-      :width 90%
+      width: 90%
       #sidebar
-        :float left
-        :margin-left 20%
+        float: left
+        margin-left: 20%
         .ie6 &
-          :margin-left 40%
+          margin-left: 40%
 
 Which would become:
 
@@ -361,23 +358,23 @@ Which would become:
         .ie6 #main #sidebar {
           margin-left: 40%; }
 
-### Attribute Namespaces
+### Property Namespaces
 
-CSS has quite a few attributes that are in "namespaces;"
+CSS has quite a few properties that are in "namespaces;"
 for instance, `font-family`, `font-size`, and `font-weight`
 are all in the `font` namespace.
-In CSS, if you want to set a bunch of attributes in the same namespace,
+In CSS, if you want to set a bunch of properties in the same namespace,
 you have to type it out each time.
 Sass offers a shortcut for this:
 just write the namespace one,
-then indent each of the sub-attributes within it.
+then indent each of the sub-properties within it.
 For example:
 
     .funky
-      :font
-        :family fantasy
-        :size 30em
-        :weight bold
+      font:
+        family: fantasy
+        size: 30em
+        weight: bold
 
 is compiled to:
 
@@ -386,9 +383,9 @@ is compiled to:
       font-size: 30em;
       font-weight: bold; }
 
-### Rule Escaping: `\`
+### Selector Escaping: `\`
 
-In case, for whatever reason, you need to write a rule
+In case, for whatever reason, you need to write a selector
 that begins with a Sass-meaningful character,
 you can escape it with a backslash (`\`).
 For example:
@@ -443,7 +440,7 @@ For example,
 would compile to
 
     .foo
-      :color #f00
+      color: #f00
 
 whereas
 
@@ -534,9 +531,9 @@ anything other than `false`:
 
     p
       @if 1 + 1 == 2
-        :border 1px solid
+        border: 1px solid
       @if 5 < 3
-        :border 2px dotted
+        border: 2px dotted
 
 is compiled to:
 
@@ -553,13 +550,13 @@ For example:
     !type = "monster"
     p
       @if !type == "ocean"
-        :color blue
+        color: blue
       @else if !type == "matador"
-        :color red
+        color: red
       @else if !type == "monster"
-        :color green
+        color: green
       @else
-        :color black
+        color: black
 
 is compiled to:
 
@@ -582,7 +579,7 @@ For example:
 
     @for !i from 1 through 3
       .item-#{!i}
-        :width = 2em * !i
+        width = 2em * !i
 
 is compiled to:
 
@@ -604,7 +601,7 @@ For example:
     !i = 6
     @while !i > 0
       .item-#{!i}
-        :width = 2em * !i
+        width = 2em * !i
       !i = !i - 2
 
 is compiled to:
@@ -624,6 +621,25 @@ In addition to the declarative templating system,
 Sass supports a simple language known as SassScript
 for dynamically computing CSS values and controlling
 the styles and selectors that get emitted.
+
+SassScript can be used as the value for a property
+by using `=` instead of `:`.
+For example:
+
+    color = #123 + #234
+
+is compiled to:
+
+    color: #357;
+
+For old-style properties, the `=` is added but the `:` is retained.
+For example:
+
+    :color = #123 + #234
+
+is compiled to:
+
+    color: #357;
 
 ### Interactive Shell
 
@@ -652,10 +668,10 @@ and are set like so:
     !width = 5em
 
 You can then refer to them by putting an equals sign
-after your attributes:
+after your properties:
 
     #main
-      :width = !width
+      width = !width
 
 Variables that are first defined in a scoped context are only
 available in that context.
@@ -674,10 +690,10 @@ in a SassScript context will cause an error:
     p
       !width = 5em
       // This will cause an error
-        :border = !width solid blue
+        border = !width solid blue
       // Use one of the following forms instead:
-      :border = "#{!width} solid blue"
-      :border = !width "solid" "blue"
+      border = "#{!width} solid blue"
+      border = !width "solid" "blue"
 
 is compiled to:
 
@@ -693,7 +709,7 @@ SassScript supports the standard arithmetic operations on numbers
 and will automatically convert between units if it can:
 
     p
-      :width = 1in + 8pt
+      width = 1in + 8pt
 
 is compiled to:
 
@@ -711,7 +727,7 @@ Most arithmetic operations are supported for color values,
 where they work piecewise:
 
     p
-      :color = #010203 + #040506
+      color = #010203 + #040506
 
 is compiled to:
 
@@ -721,7 +737,7 @@ is compiled to:
 Some arithmetic operations even work between numbers and colors:
 
     p
-      :color = #010203 * 2
+      color = #010203 * 2
 
 is compiled to:
 
@@ -731,7 +747,7 @@ is compiled to:
 The `+` operation can be used to concatenate strings:
 
     p
-      :cursor = "e" + "-resize"
+      cursor = "e" + "-resize"
 
 is compiled to:
 
@@ -742,7 +758,7 @@ Within a string of text, #{} style interpolation can be used to
 place dynamic values within the string:
 
     p
-      :border = "#{5px + 10pt} solid #ccc"
+      border = "#{5px + 10pt} solid #ccc"
 
 Finally, SassScript supports `and`, `or`, and `not` operators
 for boolean values.
@@ -752,7 +768,7 @@ for boolean values.
 Parentheses can be used to affect the order of operations:
 
     p
-      :width = 1em + (2em * 3)
+      width = 1em + (2em * 3)
 
 is compiled to:
 
@@ -765,7 +781,7 @@ SassScript defines some useful functions
 that are called using the normal CSS function syntax:
 
     p
-      :color = hsl(0, 100%, 50%)
+      color = hsl(0, 100%, 50%)
 
 is compiled to:
 
@@ -780,7 +796,7 @@ See {Sass::Script::Functions} for more information.
 ### Interpolation: `#{}`
 
 You can also use SassScript variables in selectors
-and attribute names using #{} interpolation syntax:
+and property names using #{} interpolation syntax:
 
     !name = foo
     !attr = border
@@ -817,7 +833,7 @@ is compiled to:
 
 ## Mixins
 
-Mixins enable you to define groups of CSS attributes and
+Mixins enable you to define groups of CSS properties and
 then include them inline in any number of selectors
 throughout the document. This allows you to keep your
 stylesheets DRY and also avoid placing presentation
@@ -829,11 +845,11 @@ To define a mixin you use a slightly modified form of selector syntax.
 For example the `large-text` mixin is defined as follows:
 
     =large-text
-      :font
-        :family Arial
-        :size 20px
-        :weight bold
-      :color #ff0000
+      font:
+        family: Arial
+        size: 20px
+        weight: bold
+      color: #ff0000
 
 The initial `=` marks this as a mixin rather than a standard selector.
 The CSS rules that follow won't be included until the mixin is referenced later on.
@@ -861,9 +877,9 @@ we include the statment `+large-text` in our selector definition thus:
 
     .page-title
       +large-text
-      :padding 4px
-      :margin
-        :top 10px
+      padding: 4px
+      margin:
+        top: 10px
 
 This will produce the following CSS output:
 
@@ -900,10 +916,10 @@ into the top most level of a document.
 Mixins can take arguments which can be used with SassScript:
 
     =sexy-border(!color)
-      :border
-        :color = !color
-        :width 1in
-        :style dashed
+      border:
+        color = !color
+        width: 1in
+        style: dashed
     p
       +sexy-border("blue")
 
@@ -917,10 +933,10 @@ is compiled to:
 Mixins can also specify default values for their arguments:
 
     =sexy-border(!color, !width = 1in)
-      :border
-        :color = !color
-        :width = !width
-        :style dashed
+      border:
+        color = !color
+        width = !width
+        style: dashed
     p
       +sexy-border("blue")
 
@@ -946,14 +962,14 @@ For example:
 
     /* A very awesome rule.
     #awesome.rule
-      /* An equally awesome attribute.
-      :awesomeness very
+      /* An equally awesome property.
+      awesomeness: very
 
 becomes
 
     /* A very awesome rule. */
     #awesome.rule {
-      /* An equally awesome attribute. */
+      /* An equally awesome property. */
       awesomeness: very; }
 
 You can also nest content beneath loud comments. For example:
@@ -963,8 +979,8 @@ You can also nest content beneath loud comments. For example:
         the styling of the element
         that represents
         a peanut butter and jelly sandwich.
-      :background-image url(/images/pbj.png)
-      :color red
+      background-image: url(/images/pbj.png)
+      color: red
 
 becomes
 
@@ -987,8 +1003,8 @@ For example:
 
     // A very awesome rule.
     #awesome.rule
-      // An equally awesome attribute.
-      :awesomeness very
+      // An equally awesome property.
+      awesomeness: very
 
 becomes
 
@@ -1000,7 +1016,7 @@ For example:
 
     // A very awesome rule
     #awesome.rule
-      // Don't use these attributes
+      // Don't use these properties
         color: green
         font-size: 10em
       color: red
@@ -1026,7 +1042,7 @@ outside Rails, it's done by passing an options hash with `:style` set.
 Nested style is the default Sass style,
 because it reflects the structure of the document
 in much the same way Sass does.
-Each attribute has its own line,
+Each property has its own line,
 but the indentation isn't constant.
 Each rule is indented based on how deeply it's nested.
 For example:
@@ -1050,8 +1066,8 @@ without actually reading anything.
 ### `:expanded`
 
 Expanded is the typical human-made CSS style,
-with each attribute and rule taking up one line.
-Attributes are indented within the rules,
+with each property and rule taking up one line.
+Properties are indented within the rules,
 but the rules aren't indented in any special way.
 For example:
 
@@ -1075,7 +1091,7 @@ Compact style, as the name would imply,
 takes up less space than Nested or Expanded.
 However, it's also harder to read.
 Each CSS rule takes up only one line,
-with every attribute defined on that line.
+with every property defined on that line.
 Nested rules are placed next to each other with no newline,
 while groups of rules have newlines between them.
 For example:
