@@ -186,8 +186,8 @@ SASS
   end
 
   def test_css_import
-    assert_equal("@import url(./fonts.css) screen;", render("@import url(./fonts.css) screen"))
-    assert_equal("@import \"./fonts.css\" screen;", render("@import \"./fonts.css\" screen"))
+    assert_equal("@import url(./fonts.css) screen;\n", render("@import url(./fonts.css) screen"))
+    assert_equal("@import \"./fonts.css\" screen;\n", render("@import \"./fonts.css\" screen"))
   end
 
   def test_sass_import
@@ -273,7 +273,7 @@ SASS
   end
 
   def test_directive
-    assert_equal("@a b;", render("@a b"))
+    assert_equal("@a b;\n", render("@a b"))
 
     assert_equal("@a {\n  b: c; }\n", render("@a\n  :b c"))
     assert_equal("@a { b: c; }\n", render("@a\n  :b c", :style => :compact))
@@ -756,6 +756,30 @@ CSS
            Where the indentation is wonky.
 .comment
   width: 1px
+SASS
+  end
+
+  def test_plus_with_space
+    assert_equal(<<CSS, render(<<SASS))
+a + b {
+  color: green; }
+CSS
+a
+  + b
+    color: green
+SASS
+  end
+
+  def test_empty_line_comment
+    assert_equal(<<CSS, render(<<SASS))
+/* Foo
+ *
+ * Bar */
+CSS
+/*
+  Foo
+
+  Bar
 SASS
   end
 
