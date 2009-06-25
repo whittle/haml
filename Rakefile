@@ -155,7 +155,7 @@ rescue LoadError
 end
 
 task :pages do
-  puts "#{'=' * 50} Running rake proj PROJ=#{ENV["PROJ"].inspect}"
+  puts "#{'=' * 50} Running rake pages PROJ=#{ENV["PROJ"].inspect}"
   raise 'No ENV["PROJ"]!' unless proj = ENV["PROJ"]
   sh %{git checkout #{proj}-pages}
   sh %{git reset --hard origin/#{proj}-pages}
@@ -261,6 +261,8 @@ task :handle_update do
   begin
     if ENV["REF"] == "refs/heads/master"
       sh %{rake release_edge --trace}
+      sh %{rake pages --trace PROJ=haml}
+      sh %{rake pages --trace PROJ=sass}
     elsif ENV["REF"] =~ %r{^refs/heads/(haml|sass)-pages$}
       sh %{rake pages --trace PROJ=#{$1}}
     end
