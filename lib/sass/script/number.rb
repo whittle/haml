@@ -54,7 +54,7 @@ module Sass::Script
     #
     # @param other [Literal] The right-hand side of the operator
     # @return [Literal] The result of the operation
-    # @raise [Sass::SyntaxError] if `other` is a number with incompatible units
+    # @raise [Sass::UnitConversionError] if `other` is a number with incompatible units
     def plus(other)
       if other.is_a? Number
         operate(other, :+)
@@ -76,7 +76,7 @@ module Sass::Script
     #
     # @param other [Literal] The right-hand side of the operator
     # @return [Literal] The result of the operation
-    # @raise [Sass::SyntaxError] if `other` is a number with incompatible units
+    # @raise [Sass::UnitConversionError] if `other` is a number with incompatible units
     def minus(other)
       if other.is_a? Number
         operate(other, :-)
@@ -138,11 +138,11 @@ module Sass::Script
     # @param other [Number] The right-hand side of the operator
     # @return [Number] This number modulo the other
     # @raise [NoMethodError] if `other` is an invalid type
-    # @raise [Sass::SyntaxError] if `other` has any units
+    # @raise [Sass::UnitConversionError] if `other` has any units
     def mod(other)
       if other.is_a?(Number)
         unless other.unitless?
-          raise Sass::SyntaxError.new("Cannot modulo by a number with units: #{other.inspect}.")
+          raise Sass::UnitConversionError.new("Cannot modulo by a number with units: #{other.inspect}.")
         end
         operate(other, :%)
       else
@@ -155,9 +155,19 @@ module Sass::Script
     # @param other [Literal] The right-hand side of the operator
     # @return [Boolean] Whether this number is equal to the other object
     def eq(other)
-      Sass::Script::Bool.new(super.to_bool &&
-        self.numerator_units.sort == other.numerator_units.sort &&
-        self.denominator_units.sort == other.denominator_units.sort)
+      return Sass::Script::Bool.new(false) unless other.is_a?(Sass::Script::Number)
+      this = self
+      begin
+        if unitless?
+          this = this.coerce(other.numerator_units, other.denominator_units)
+        else
+          other = other.coerce(numerator_units, denominator_units)
+        end
+      rescue Sass::UnitConversionError
+        return Sass::Script::Bool.new(false)
+      end
+
+      Sass::Script::Bool.new(this.value == other.value)
     end
 
     # The SassScript `>` operation.
@@ -249,11 +259,36 @@ module Sass::Script
       (numerator_units.empty? || numerator_units.size == 1) && denominator_units.empty?
     end
 
+    # Returns this number converted to other units.
+    # The conversion takes into account the relationship between e.g. mm and cm,
+    # as well as between e.g. in and cm.
+    #
+    # If this number has no units, it will simply return itself
+    # with the given units.
+    #
+    # An incompatible coercion, e.g. between px and cm, will raise an error.
+    #
+    # @param num_units [Array<String>] The numerator units to coerce this number into.
+    #   See {#numerator\_units}
+    # @param den_units [Array<String>] The denominator units to coerce this number into.
+    #   See {#denominator\_units}
+    # @return [Number] The number with the new units
+    # @raise [Sass::UnitConversionError] if the given units are incompatible with the number's
+    #   current units
+    def coerce(num_units, den_units)
+      Number.new(if unitless?
+                   self.value
+                 else
+                   self.value * coercion_factor(self.numerator_units, num_units) /
+                     coercion_factor(self.denominator_units, den_units)
+                 end, num_units, den_units)
+    end
+
     protected
 
     def operate(other, operation)
       this = self
-      if [:+, :-].include?(operation)
+      if [:+, :-, :<=, :<, :>, :>=].include?(operation)
         if unitless?
           this = this.coerce(other.numerator_units, other.denominator_units)
         else
@@ -271,21 +306,12 @@ module Sass::Script
       end
     end
 
-    def coerce(num_units, den_units)
-      Number.new(if unitless?
-                          self.value
-                        else
-                          self.value * coercion_factor(self.numerator_units, num_units) /
-                            coercion_factor(self.denominator_units, den_units)
-                        end, num_units, den_units)
-    end
-    
     def coercion_factor(from_units, to_units)
       # get a list of unmatched units
       from_units, to_units = sans_common_units(from_units, to_units)
 
       if from_units.size != to_units.size || !convertable?(from_units | to_units)
-        raise Sass::SyntaxError.new("Incompatible units: '#{from_units.join('*')}' and '#{to_units.join('*')}'.")
+        raise Sass::UnitConversionError.new("Incompatible units: '#{from_units.join('*')}' and '#{to_units.join('*')}'.")
       end
 
       from_units.zip(to_units).inject(1) {|m,p| m * conversion_factor(p[0], p[1]) }

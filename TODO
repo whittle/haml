@@ -3,6 +3,10 @@
 
 * Documentation
   Redo tutorial?
+  Contribution information
+    Will be code reviewed
+    [Haml]/[Sass], punctuation
+    Don't forget docs
   [2.4] Syntax highlighting?
 ** FAQ
    form_for needs -, not =
@@ -10,6 +14,7 @@
 * Code
 ** Haml
    Figure out alternate attribute syntax
+   Write HAML_CHANGELOG
    [2.4] Allow "!!! HTML5" to set :format => :html5 ?
      How do we deal with partials?
    [2.4] :ugly + :html improvements
