@@ -95,7 +95,8 @@ class TemplateTest < Test::Unit::TestCase
   end
 
   def assert_renders_correctly(name, &render_method)
-    if ActionPack::VERSION::MAJOR < 2 || ActionPack::VERSION::MINOR < 2
+    if ActionPack::VERSION::MAJOR < 2 ||
+        (ActionPack::VERSION::MAJOR == 2 && ActionPack::VERSION::MINOR < 2)
       render_method ||= proc { |name| @base.render(name) }
     else
       render_method ||= proc { |name| @base.render(:file => name) }
@@ -139,7 +140,7 @@ class TemplateTest < Test::Unit::TestCase
   end
 
   def test_action_view_templates_render_correctly
-    @base.instance_variable_set("@content_for_layout", 'Lorem ipsum dolor sit amet')
+    @base.content_for(:layout) {'Lorem ipsum dolor sit amet'}
     assert_renders_correctly 'content_for_layout'
   end
 

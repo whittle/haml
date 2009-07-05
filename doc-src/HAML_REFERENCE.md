@@ -117,6 +117,14 @@ Available options are:
   and rendering partials.
   Defaults to false.
 
+{#ugly-option} `:ugly`
+: If set to `true`, Haml makes no attempt to properly
+  indent or format the HTML output.
+  This causes the rendering to be done much quicker than it would otherwise,
+  but makes viewing the source unpleasant.
+  Defaults to `false`, but is set to `true`
+  in production for Rails.
+
 {#suppress_eval-option} `:suppress_eval`
 : Whether or not attribute hashes and Ruby scripts
   designated by `=` or `~` should be
@@ -293,6 +301,12 @@ For those you'll have to use the `{}` syntax.
 You can, however, use both syntaxes together:
 
     %a(title=@title){:href => @link.href} Stuff
+
+HTML-style attributes can be stretched across multiple lines
+just like hash-style attributes:
+
+    %script(type="text/javascript"
+            src="javascripts/script_#{2 + 7}")
 
 #### Attribute Methods
 
@@ -1049,7 +1063,7 @@ Haml has the following filters defined:
 
 You can also define your own filters (see {Haml::Filters}).
 
-## Multiline: `|`
+## Multiline: `|` {#multiline}
 
 The pipe character designates a multiline string.
 It's placed at the end of a line (after some whitespace)
