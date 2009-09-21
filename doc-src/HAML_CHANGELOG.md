@@ -3,7 +3,7 @@
 * Table of contents
 {:toc}
 
-## 2.4.0
+## 2.4.0 (Unreleased)
 
 ### Object Reference Customization
 
@@ -22,6 +22,11 @@ that causes attributes to use a double-quote mark rather than single-quote.
 We've added the cross-implementation tests from the [haml-spec](http://github.com/norman/haml-spec) project
 to the standard Haml test suite, to be sure we remain compatible with the base functionality
 of the many and varied [Haml implementations](http://en.wikipedia.org/wiki/Haml#Implementations).
+
+## 2.2.6 (Unreleased)
+
+* Made the error message when unable to load a dependency for html2haml
+  respect the `--trace` option.
 
 ## [2.2.5](http://github.com/nex3/haml/commit/2.2.5)
 
