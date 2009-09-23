@@ -230,6 +230,62 @@ SASS
 CSS
   end
 
+  # Error reporting
+
+  def test_error_reporting
+    css2sass("foo")
+    assert(false, "Expected exception")
+  rescue Sass::SyntaxError => err
+    assert_equal(1, err.sass_line)
+    assert_equal('Invalid CSS after "foo": expected "{", was ""', err.message)
+  end
+
+  def test_error_reporting_in_line
+    css2sass("foo\nbar }\nbaz")
+    assert(false, "Expected exception")
+  rescue Sass::SyntaxError => err
+    assert_equal(2, err.sass_line)
+    assert_equal('Invalid CSS after "bar ": expected "{", was "}"', err.message)
+  end
+
+  def test_error_truncate_after
+    css2sass("#{"a" * 15}foo")
+    assert(false, "Expected exception")
+  rescue Sass::SyntaxError => err
+    assert_equal(1, err.sass_line)
+    assert_equal('Invalid CSS after "...aaaaaaaaaaaafoo": expected "{", was ""', err.message)
+  end
+
+  def test_error_truncate_was
+    css2sass("foo }#{"a" * 15}")
+    assert(false, "Expected exception")
+  rescue Sass::SyntaxError => err
+    assert_equal(1, err.sass_line)
+    assert_equal('Invalid CSS after "foo ": expected "{", was "}aaaaaaaaaaaaaa..."', err.message)
+  end
+
+  # Encodings
+
+  unless Haml::Util.ruby1_8?
+    def test_encoding_error
+      css2sass("foo\nbar\nb\xFEaz".force_encoding("utf-8"))
+      assert(false, "Expected exception")
+    rescue Sass::SyntaxError => e
+      assert_equal(3, e.sass_line)
+      assert_equal('Invalid UTF-8 character "\xFE"', e.message)
+    end
+
+    def test_ascii_incompatible_encoding_error
+      template = "foo\nbar\nb_z".encode("utf-16le")
+      template[9] = "\xFE".force_encoding("utf-16le")
+      css2sass(template)
+      assert(false, "Expected exception")
+    rescue Sass::SyntaxError => e
+      assert_equal(3, e.sass_line)
+      assert_equal('Invalid UTF-16LE character "\xFE"', e.message)
+    end
+  end
+
   private
 
   def css2sass(string, opts={})

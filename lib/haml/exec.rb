@@ -414,6 +414,9 @@ END
         @module_opts[:rhtml] &&= @options[:no_rhtml] != false
 
         output.write(::Haml::HTML.new(input, @module_opts).render)
+      rescue ::Haml::Error => e
+        raise "#{e.is_a?(::Haml::SyntaxError) ? "Syntax error" : "Error"} on line " +
+          "#{get_line e}: #{e.message}"
       end
     end
 
@@ -458,6 +461,9 @@ END
         output = @options[:output]
 
         output.write(::Sass::CSS.new(input, @module_opts).render)
+      rescue ::Sass::SyntaxError => e
+        raise e if @options[:trace]
+        raise "Syntax error on line #{get_line e}: #{e.message}\n  Use --trace for backtrace"
       end
     end
   end

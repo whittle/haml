@@ -23,6 +23,12 @@ We've added the cross-implementation tests from the [haml-spec](http://github.co
 to the standard Haml test suite, to be sure we remain compatible with the base functionality
 of the many and varied [Haml implementations](http://en.wikipedia.org/wiki/Haml#Implementations).
 
+### Ruby 1.9 Support
+
+Haml and `html2haml` now produce more descriptive errors
+when given a template with invalid byte sequences for that template's encoding,
+including the line number and the offending character.
+
 ## 2.2.6 (Unreleased)
 
 * Made the error message when unable to load a dependency for html2haml

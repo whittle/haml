@@ -16,6 +16,24 @@ In addition, when the `sass` executable encounters an error,
 it now prints the filename where the error occurs,
 as well as a backtrace of Sass imports.
 
+### Ruby 1.9 Support
+
+Sass and `css2sass` now produce more descriptive errors
+when given a template with invalid byte sequences for that template's encoding,
+including the line number and the offending character.
+
+### `css2sass` Error Handling
+
+Several bug fixes and minor improvements have been made, including:
+
+* Fixing line-number reporting for errors on the last line of templates
+  that didn't have trailing newlines.
+
+* Only displaying the text for the current line when reporting CSS parsing errors.
+
+* Displaying the expected strings as strings rather than regular expressions
+  whenever possible.
+
 ## 2.2.6 (Unreleased)
 
 * Don't crash when the `__FILE__` constant of a Ruby file is a relative path,
@@ -25,6 +43,7 @@ as well as a backtrace of Sass imports.
 ## [2.2.5](http://github.com/nex3/haml/commit/2.2.5)
 
 There were no changes made to Sass between versions 2.2.4 and 2.2.5.
+>>>>>>> 6e5bc03012c7ea80eda713d6fdc033a47d25cc57:doc-src/SASS_CHANGELOG.md
 
 ## [2.2.4](http://github.com/nex3/haml/commit/2.2.4)
 

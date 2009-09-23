@@ -62,11 +62,15 @@ module Sass
     # @option options :old [Boolean] (false)
     #     Whether or not to output old property syntax
     #     (`:color blue` as opposed to `color: blue`).
+    # @option options :filename [String]
+    #     The filename of the CSS file being processed.
+    #     Used for error reporting
     def initialize(template, options = {})
       if template.is_a? IO
         template = template.read
       end
 
+      @line = 1
       @options = options.dup
       # Backwards compatibility
       @options[:old] = true if @options[:alternate] == false
@@ -76,15 +80,16 @@ module Sass
     # Converts the CSS template into Sass code.
     #
     # @return [String] The resulting Sass code
+    # @raise [Sass::SyntaxError] if there's an error parsing the CSS template
     def render
-      begin
-        build_tree.to_sass(0, @options).strip + "\n"
-      rescue Exception => err
-        line = @template.string[0...@template.pos].split("\n").size
-
-        err.backtrace.unshift "(css):#{line}"
-        raise err
+      Haml::Util.check_encoding(@template.string) do |msg, line|
+        raise Sass::SyntaxError.new(msg, :line => line)
       end
+
+      build_tree.to_sass(0, @options).strip + "\n"
+    rescue Sass::SyntaxError => err
+      err.modify_backtrace(:filename => @options[:filename] || '(css)', :line => @line)
+      raise err
     end
 
     private
@@ -120,7 +125,7 @@ module Sass
     def rule
       rule = ""
       loop do
-        token = @template.scan(/(?:[^\{\};\/\s]|\/[^*])+/)
+        token = scan(/(?:[^\{\};\/\s]|\/[^*])+/)
         if token.nil?
           return if rule.empty?
           break
@@ -136,7 +141,7 @@ module Sass
 
       if directive
         node = Tree::DirectiveNode.new(rule)
-        return node if @template.scan(/;/)
+        return node if scan(/;/)
 
         assert_match /\{/
         whitespace
@@ -155,14 +160,14 @@ module Sass
     #
     # @param rule [Tree::RuleNode] The parent node of the properties
     def properties(rule)
-      while @template.scan(/[^:\}\s]+/)
+      while scan(/[^:\}\s]+/)
         name = @template[0]
         whitespace
 
         assert_match /:/
 
         value = ''
-        while @template.scan(/[^;\s\}]+/)
+        while scan(/[^;\s\}]+/)
           value << @template[0] << whitespace
         end
 
@@ -177,12 +182,12 @@ module Sass
     #
     # @return [String] The ignored whitespace
     def whitespace
-      space = @template.scan(/\s*/) || ''
+      space = scan(/\s*/) || ''
 
       # If we've hit a comment,
       # go past it and look for more whitespace
-      if @template.scan(/\/\*/)
-        @template.scan_until(/\*\//)
+      if scan(/\/\*/)
+        scan_until(/\*\//)
         return space + whitespace
       end
       return space
@@ -193,26 +198,42 @@ module Sass
     #
     # @param re [Regexp] The regular expression to assert
     def assert_match(re)
-      if @template.scan(re)
+      if scan(re)
         whitespace
         return
       end
 
-      line = @template.string[0..@template.pos].count "\n"
       pos = @template.pos
 
-      after = @template.string[pos - 15...pos]
+      after = @template.string[[pos - 15, 0].max...pos].gsub(/.*\n/m, '')
       after = "..." + after if pos >= 15
 
       # Display basic regexps as plain old strings
-      expected = re.source == Regexp.escape(re.source) ? "\"#{re.source}\"" : re.inspect
+      string = re.source.gsub(/\\(.)/, '\1')
+      expected = re.source == Regexp.escape(string) ? string.inspect : re.inspect
 
-      was = @template.rest[0...15]
+      was = @template.rest[0...15].gsub(/\n.*/m, '')
       was += "..." if @template.rest.size >= 15
-      raise Exception.new(<<MESSAGE)
-Invalid CSS on line #{line + 1} after #{after.inspect}:
-  expected #{expected}, was #{was.inspect}
-MESSAGE
+      raise Sass::SyntaxError.new(
+        "Invalid CSS after #{after.inspect}: expected #{expected}, was #{was.inspect}")
+    end
+
+    # Identical to `@template.scan`, except that it increments the line count.
+    # `@template.scan` should never be called directly;
+    # this should be used instead.
+    def scan(re)
+      str = @template.scan(re)
+      @line += str.count "\n" if str
+      str
+    end
+
+    # Identical to `@template.scan_until`, except that it increments the line count.
+    # `@template.scan_until` should never be called directly;
+    # this should be used instead.
+    def scan_until(re)
+      str = @template.scan_until(re)
+      @line += str.count "\n" if str
+      str
     end
 
     # Transform
