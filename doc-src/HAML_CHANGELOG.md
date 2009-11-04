@@ -124,6 +124,22 @@ including the line number and the offending character.
 
 ## 2.2.11 (Unreleased)
 
+* Fixed a bug with XSS protection where HTML escaping would raise an error
+  if passed a non-string value.
+  Note that this doesn't affect any HTML escaping when XSS protection is disabled.
+
+* Fixed a bug in outer-whitespace nuking where whitespace-only Ruby strings
+  blocked whitespace nuking beyond them.
+
+* Use `ensure` to protect the resetting of the Haml output buffer
+  against exceptions that are raised within the compiled Haml code.
+
+* Fix an error line-numbering bug that appeared if an error was thrown
+  within loud script (`=`).
+  This is not the best solution, as it disables a few optimizations,
+  but it shouldn't have too much effect and the optimizations
+  will hopefully be re-enabled in version 2.4.
+
 * Allow multiple ids to be used on the same element.
   They will be concatenated together with an underscore.
   For example, `%p#foo#bar` will become `<p id="foo_bar">`.
