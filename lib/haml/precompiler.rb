@@ -306,15 +306,23 @@ END
     def flush_merged_text
       return if @to_merge.empty?
 
-      text, tab_change = @to_merge.inject(["", 0]) do |(str, mtabs), (type, val, tabs)|
+      str = ""
+      mtabs = 0
+      newlines = 0
+      @to_merge.each do |type, val, tabs|
         case type
         when :text
-          [str << val.inspect[1...-1], mtabs + tabs]
+          str << val.inspect[1...-1]
+          mtabs += tabs
         when :script
           if mtabs != 0 && !@options[:ugly]
             val = "_hamlout.adjust_tabs(#{mtabs}); " + val
           end
-          [str << "\#{#{val}}", 0]
+          str << "\#{#{"\n" * newlines}#{val}}"
+          mtabs = 0
+          newlines = 0
+        when :newlines
+          newlines += val
         else
           raise SyntaxError.new("[HAML BUG] Undefined entry in Haml::Precompiler@to_merge.")
         end
@@ -322,10 +330,11 @@ END
 
       @precompiled <<
         if @options[:ugly]
-          "_hamlout.buffer << \"#{text}\";"
+          "_hamlout.buffer << \"#{str}\";"
         else
-          "_hamlout.push_text(\"#{text}\", #{tab_change}, #{@dont_tab_up_next_text.inspect});"
+          "_hamlout.push_text(\"#{str}\", #{mtabs}, #{@dont_tab_up_next_text.inspect});"
         end
+      @precompiled << "\n" * newlines
       @to_merge = []
       @dont_tab_up_next_text = false
     end
@@ -1008,8 +1017,7 @@ END
 
     def resolve_newlines
       return unless @newlines > 0
-      flush_merged_text unless @to_merge.all? {|type, *_| type == :text}
-      @precompiled << "\n" * @newlines
+      @to_merge << [:newlines, @newlines]
       @newlines = 0
     end
 
@@ -1032,6 +1040,8 @@ END
         end
       when :script
         last[1].gsub!(/\(haml_temp, (.*?)\);$/, '(haml_temp.rstrip, \1);')
+        rstrip_buffer! index - 1
+      when :newlines
         rstrip_buffer! index - 1
       else
         raise SyntaxError.new("[HAML BUG] Undefined entry in Haml::Precompiler@to_merge.")
