@@ -29,6 +29,11 @@ Haml and `html2haml` now produce more descriptive errors
 when given a template with invalid byte sequences for that template's encoding,
 including the line number and the offending character.
 
+### `:css` Filter
+
+Haml now supports a {file:HAML_REFERENCE.md#css-filter `:css` filter}
+that surrounds the filtered text with `<style>` and CDATA tags.
+
 ### `html2haml` Improvements
 
 * Ruby blocks within ERB are now supported.
@@ -74,6 +79,7 @@ including the line number and the offending character.
         Flip #{bang}.
 
 * `<script>` tags are now transformed into `:javascript` filters,
+  and `<style>` tags into `:css` filters.
   and indentation is preserved.
   For example:
 

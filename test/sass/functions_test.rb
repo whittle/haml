@@ -3,44 +3,17 @@ require File.dirname(__FILE__) + '/../../lib/sass'
 require 'sass/script'
 
 class SassFunctionTest < Test::Unit::TestCase
-  def test_hsl
-    # These tests adapted from the w3c browser tests
-    # http://www.w3.org/Style/CSS/Test/CSS3/Color/20070927/html4/t040204-hsl-h-rotating-b.htm
-    red = [255, 0, 0]
-    assert_rgb_hsl(red, ['0', '100%', '50%'])
-    assert_rgb_hsl(red, ['-360', '100%', '50%'])
-    assert_rgb_hsl(red, ['360', '100%', '50%'])
-    assert_rgb_hsl(red, ['6120', '100%', '50%'])
-
-    yellow = [255, 255, 0]
-    assert_rgb_hsl(yellow, ['60', '100%', '50%'])
-    assert_rgb_hsl(yellow, ['-300', '100%', '50%'])
-    assert_rgb_hsl(yellow, ['420', '100%', '50%'])
-    assert_rgb_hsl(yellow, ['-9660', '100%', '50%'])
-
-    green = [0, 255, 0]
-    assert_rgb_hsl(green, ['120', '100%', '50%'])
-    assert_rgb_hsl(green, ['-240', '100%', '50%'])
-    assert_rgb_hsl(green, ['480', '100%', '50%'])
-    assert_rgb_hsl(green, ['99840', '100%', '50%'])
-
-    cyan = [0, 255, 255]
-    assert_rgb_hsl(cyan, ['180', '100%', '50%'])
-    assert_rgb_hsl(cyan, ['-180', '100%', '50%'])
-    assert_rgb_hsl(cyan, ['540', '100%', '50%'])
-    assert_rgb_hsl(cyan, ['-900', '100%', '50%'])
-
-    blue = [0, 0, 255]
-    assert_rgb_hsl(blue, ['240', '100%', '50%'])
-    assert_rgb_hsl(blue, ['-120', '100%', '50%'])
-    assert_rgb_hsl(blue, ['600', '100%', '50%'])
-    assert_rgb_hsl(blue, ['-104880', '100%', '50%'])
-
-    purple = [255, 0, 255]
-    assert_rgb_hsl(purple, ['300', '100%', '50%'])
-    assert_rgb_hsl(purple, ['-60', '100%', '50%'])
-    assert_rgb_hsl(purple, ['660', '100%', '50%'])
-    assert_rgb_hsl(purple, ['2820', '100%', '50%'])
+  # Tests taken from:
+  #   http://www.w3.org/Style/CSS/Test/CSS3/Color/20070927/html4/t040204-hsl-h-rotating-b.htm
+  #   http://www.w3.org/Style/CSS/Test/CSS3/Color/20070927/html4/t040204-hsl-values-b.htm
+  File.read(File.dirname(__FILE__) + "/data/hsl-rgb.txt").split("\n\n").each do |chunk|
+    hsls, rgbs = chunk.strip.split("====")
+    hsls.strip.split("\n").zip(rgbs.strip.split("\n")) do |hsl, rgb|
+      method = "test_hsl: #{hsl} = #{rgb}"
+      define_method(method) do
+        assert_equal(evaluate(rgb), evaluate(hsl))
+      end
+    end
   end
 
   def test_hsl_checks_bounds
@@ -48,13 +21,22 @@ class SassFunctionTest < Test::Unit::TestCase
     assert_error_message("Lightness 256 must be between 0% and 100% for `hsl'", "hsl(10, 10, 256%)");
   end
 
+  def test_hsl_checks_types
+    assert_error_message("\"foo\" is not a number for `hsl'", "hsl(\"foo\", 10, 12)");
+    assert_error_message("\"foo\" is not a number for `hsl'", "hsl(10, \"foo\", 12)");
+    assert_error_message("\"foo\" is not a number for `hsl'", "hsl(10, 10, \"foo\")");
+  end
+
   def test_percentage
     assert_equal("50%",  evaluate("percentage(.5)"))
     assert_equal("100%", evaluate("percentage(1)"))
     assert_equal("25%",  evaluate("percentage(25px / 100px)"))
+  end
+
+  def test_percentage_checks_types
     assert_error_message("25px is not a unitless number for `percentage'", "percentage(25px)")
     assert_error_message("#cccccc is not a unitless number for `percentage'", "percentage(#ccc)")
-    assert_error_message("string is not a unitless number for `percentage'", %Q{percentage("string")})
+    assert_error_message("\"string\" is not a unitless number for `percentage'", %Q{percentage("string")})
   end
 
   def test_round
@@ -69,14 +51,14 @@ class SassFunctionTest < Test::Unit::TestCase
     assert_equal("4",   evaluate("floor(4.8)"))
     assert_equal("4px", evaluate("floor(4.8px)"))
 
-    assert_error_message("foo is not a number for `floor'", "floor(\"foo\")")
+    assert_error_message("\"foo\" is not a number for `floor'", "floor(\"foo\")")
   end
 
   def test_ceil
     assert_equal("5",   evaluate("ceil(4.1)"))
     assert_equal("5px", evaluate("ceil(4.8px)"))
 
-    assert_error_message("a is not a number for `ceil'", "ceil(\"a\")")
+    assert_error_message("\"a\" is not a number for `ceil'", "ceil(\"a\")")
   end
 
   def test_abs
@@ -92,7 +74,9 @@ class SassFunctionTest < Test::Unit::TestCase
     assert_equal("#123456", evaluate("rgb(18, 52, 86)"))
     assert_equal("#beaded", evaluate("rgb(190, 173, 237)"))
     assert_equal("#00ff7f", evaluate("rgb(0, 255, 127)"))
+  end
 
+  def test_rgb_tests_bounds
     assert_error_message("Color value 256 must be between 0 and 255 inclusive for `rgb'",
       "rgb(256, 1, 1)")
     assert_error_message("Color value 256 must be between 0 and 255 inclusive for `rgb'",
@@ -105,12 +89,37 @@ class SassFunctionTest < Test::Unit::TestCase
       "rgb(-1, 1, 1)")
   end
 
-  private
-
-  def assert_rgb_hsl(rgb, hsl)
-    hsl = hsl.map {|v| Sass::Script::Parser.parse v, 0, 0 }
-    assert_equal(rgb, Sass::Script::Functions::EvaluationContext.new({}).hsl(*hsl).value)
+  def test_rgb_tests_types
+    assert_error_message("\"foo\" is not a number for `rgb'", "rgb(\"foo\", 10, 12)");
+    assert_error_message("\"foo\" is not a number for `rgb'", "rgb(10, \"foo\", 12)");
+    assert_error_message("\"foo\" is not a number for `rgb'", "rgb(10, 10, \"foo\")");
   end
+
+  def test_red
+    assert_equal("18", evaluate("red(#123456)"))
+  end
+
+  def test_red_exception
+    assert_error_message("12 is not a color for `red'", "red(12)")
+  end
+
+  def test_green
+    assert_equal("52", evaluate("green(#123456)"))
+  end
+
+  def test_green_exception
+    assert_error_message("12 is not a color for `green'", "green(12)")
+  end
+
+  def test_blue
+    assert_equal("86", evaluate("blue(#123456)"))
+  end
+
+  def test_blue_exception
+    assert_error_message("12 is not a color for `blue'", "blue(12)")
+  end
+
+  private
 
   def evaluate(value)
     Sass::Script::Parser.parse(value, 0, 0).perform(Sass::Environment.new).to_s

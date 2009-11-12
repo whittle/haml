@@ -5,6 +5,21 @@
 
 ## 2.4.0 (Unreleased)
 
+### Colors
+
+Sass now supports functions that return the values of the
+{Sass::Script::Functions#red red},
+{Sass::Script::Functions#blue blue},
+and {Sass::Script::Functions#green green}
+components of colors.
+
+### Variable Names
+
+SassScript variable names may now contain hyphens.
+For example:
+
+    !prettiest-color = #542FA9
+
 ### Error Backtraces
 
 Numerous bugs were fixed with the backtraces given for Sass errors,
@@ -50,6 +65,38 @@ Several bug fixes and minor improvements have been made, including:
 
 * Displaying the expected strings as strings rather than regular expressions
   whenever possible.
+
+### Minor Changes
+
+* If a CSS or Sass function is used that has the name of a color,
+  it will now be parsed as a function rather than as a color.
+  For example, `fuchsia(12)` now renders as `fuchsia(12)`
+  rather than `fuchsia 12`.
+
+## 2.2.14 (Unreleased)
+
+* {Sass::Script::Color#value} attribute is deprecated.
+  Use {Sass::Script::Color#rgb} instead.
+  This only affects people defining their own Sass functions
+  in Ruby.
+
+* All Sass functions now raise explicit errors if their inputs
+  are of the incorrect type.
+
+* Add an `assert_type` function that's available to {Sass::Script::Functions}.
+  This is useful for typechecking the inputs to functions.
+
+### Rack Support
+
+Sass 2.2.14 includes Rack middleware for running Sass,
+meaning that all Rack-enabled frameworks can now use Sass.
+To activate this, just add
+
+    require 'sass/plugin/rack'
+    use Sass::Plugin::Rack
+
+to your `config.ru`.
+See the {Sass::Plugin::Rack} documentation for more details.
 
 ## [2.2.13](http://github.com/nex3/haml/commit/2.2.13)
 
