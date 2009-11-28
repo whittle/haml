@@ -39,13 +39,13 @@ and double quotes do not.
 ### Error Backtraces
 
 Numerous bugs were fixed with the backtraces given for Sass errors,
-especially when importing files.
-All imports will now show up in the Ruby backtrace,
+especially when importing files and using mixins.
+All imports and mixins will now show up in the Ruby backtrace,
 with the proper filename and line number.
 
 In addition, when the `sass` executable encounters an error,
 it now prints the filename where the error occurs,
-as well as a backtrace of Sass imports.
+as well as a backtrace of Sass imports and mixins.
 
 ### Formatting
 
@@ -92,7 +92,9 @@ Several bug fixes and minor improvements have been made, including:
 * If a CSS or Sass function is used that has the name of a color,
   it will now be parsed as a function rather than as a color.
   For example, `fuchsia(12)` now renders as `fuchsia(12)`
-  rather than `fuchsia 12`.
+  rather than `fuchsia 12`,
+  and `tealbang(12)` now renders as `tealbang(12)`
+  rather than `teal bang(12)`.
 
 ## 2.2.15 (Unreleased)
 
@@ -100,6 +102,9 @@ Several bug fixes and minor improvements have been made, including:
   that's easier than manually constructing a new color
   and is forwards-compatible with alpha-channel colors
   (to be introduced in Sass 2.4).
+
+* Added a missing require in Sass that caused crashes
+  when it was being run standalone.
 
 ## [2.2.14](http://github.com/nex3/haml/commit/2.2.14)
 

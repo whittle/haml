@@ -103,6 +103,17 @@ module Haml
       end
     end
 
+    # Restricts a number to falling within a given range.
+    # Returns the number if it falls within the range,
+    # or the closest value in the range if it doesn't.
+    #
+    # @param value [Numeric]
+    # @param range [Range<Numeric>]
+    # @return [Numeric]
+    def restrict(value, range)
+      [[value, range.first].max, range.last].min
+    end
+
     # Concatenates all strings that are adjacent in an array,
     # while leaving other elements as they are.
     # For example:
@@ -186,6 +197,14 @@ module Haml
       Haml::Util::RUBY_VERSION[0] == 1 && Haml::Util::RUBY_VERSION[1] < 9
     end
 
+    # Checks that the encoding of a string is valid in Ruby 1.9.
+    # If it's not, yields an error string describing the invalid character
+    # and the line on which it occurrs.
+    #
+    # @param str [String] The string of which to check the encoding
+    # @yield [msg] A block in which an encoding error can be raised.
+    #   Only yields if there is an encoding error
+    # @yieldparam msg [String] The error message to be raised
     def check_encoding(str)
       return if ruby1_8?
       return if str.valid_encoding?

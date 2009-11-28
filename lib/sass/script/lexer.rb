@@ -8,16 +8,16 @@ module Sass
     class Lexer
       # A struct containing information about an individual token.
       #
-      # `type`: [{Symbol}]
+      # `type`: \[{Symbol}\]
       # : The type of token.
       #
-      # `value`: [{Object}]
+      # `value`: \[{Object}\]
       # : The Ruby object corresponding to the value of the token.
       #
-      # `line`: [{Fixnum}]
+      # `line`: \[{Fixnum}\]
       # : The line of the source file on which the token appears.
       #
-      # `offset`: [{Fixnum}]
+      # `offset`: \[{Fixnum}\]
       # : The number of bytes into the line the SassScript token appeared.
       Token = Struct.new(:type, :value, :line, :offset)
 
@@ -55,7 +55,7 @@ module Sass
         :variable => /!([\w-]+)/,
         :ident => /(\\.|[^\s\\+*\/%(),=!])+/,
         :number => /(-)?(?:(\d*\.\d+)|(\d+))([a-zA-Z%]+)?/,
-        :color => /\##{"([0-9a-fA-F]{1,2})" * 3}|(#{Color::HTML4_COLORS.keys.join("|")})(?!\()/,
+        :color => /\##{"([0-9a-fA-F]{1,2})" * 3}|(#{Color::HTML4_COLORS.keys.join("|")})(?![^\s+*\/%),=!])/,
         :bool => /(true|false)\b/,
         :op => %r{(#{Regexp.union(*OP_NAMES.map{|s| Regexp.new(Regexp.escape(s) + (s =~ /\w$/ ? '(?:\b|$)' : ''))})})}
       }
