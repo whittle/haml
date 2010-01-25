@@ -30,10 +30,12 @@ so if the Haml plugin or RubyGem is installed,
 Sass will already be installed as a plugin or gem, respectively.
 The first step for all of these is to install the Haml gem:
 
+    !!!sh
     gem install haml
 
 To run Sass from the command line, just use
 
+    !!!sh
     sass input.sass output.css
 
 Use `sass --help` for full documentation.
@@ -54,6 +56,7 @@ and using Sass::Engine like so:
 
 To enable Sass as a Rails plugin, run
 
+    !!!sh
     haml --rails path/to/rails/app
 
 To enable Sass in Merb,
@@ -232,6 +235,7 @@ but instead of using brackets to delineate the properties that belong to a parti
 Sass uses indentation.
 For example:
 
+    !!!sass
     #main p
       <property>
       <property>
@@ -242,6 +246,7 @@ However, unlike CSS, you can only do this if each line but the last
 ends with a comma.
 For example:
 
+    !!!sass
     .users #userTab,
     .posts #postsTab
       <property>
@@ -255,12 +260,14 @@ However, Sass properties don't have semicolons at the end;
 each property is on its own line, so they aren't necessary.
 For example:
 
+    !!!sass
     #main p
       color: #00ff00
       width: 97%
 
 is compiled to:
 
+    !!!css
     #main p {
       color: #00ff00;
       width: 97% }
@@ -271,12 +278,14 @@ rather than between the name and the value,
 so it's easier to tell what elements are properties just by glancing at them.
 For example:
 
+    !!!sass
     #main p
       :color #00ff00
       :width 97%
 
 is compiled to:
 
+    !!!css
     #main p {
       color: #00ff00;
       width: 97% }
@@ -291,6 +300,7 @@ Rules can also be nested within each other.
 This signifies that the inner rule's selector is a child of the outer selector.
 For example:
 
+    !!!sass
     #main p
       color: #00ff00
       width: 97%
@@ -301,6 +311,7 @@ For example:
 
 is compiled to:
 
+    !!!css
     #main p {
       color: #00ff00;
       width: 97%; }
@@ -310,6 +321,7 @@ is compiled to:
 
 This makes insanely complicated CSS layouts with lots of nested selectors very simple:
 
+    !!!sass
     #main
       width: 97%
 
@@ -323,6 +335,7 @@ This makes insanely complicated CSS layouts with lots of nested selectors very s
 
 is compiled to:
 
+    !!!css
     #main {
       width: 97%; }
       #main p, #main div {
@@ -344,6 +357,7 @@ The ampersand is automatically replaced by the parent selector,
 instead of having it prepended.
 This allows you to cleanly create pseudo-classes:
 
+    !!!sass
     a
       font-weight: bold
       text-decoration: none
@@ -354,6 +368,7 @@ This allows you to cleanly create pseudo-classes:
 
 Which would become:
 
+    !!!css
     a {
       font-weight: bold;
       text-decoration: none; }
@@ -365,6 +380,7 @@ Which would become:
 It also allows you to add selectors at the base of the hierarchy,
 which can be useuful for targeting certain styles to certain browsers:
 
+    !!!sass
     #main
       width: 90%
       #sidebar
@@ -375,6 +391,7 @@ which can be useuful for targeting certain styles to certain browsers:
 
 Which would become:
 
+    !!!css
     #main {
       width: 90%; }
       #main #sidebar {
@@ -395,6 +412,7 @@ just write the namespace one,
 then indent each of the sub-properties within it.
 For example:
 
+    !!!sass
     .funky
       font:
         family: fantasy
@@ -403,6 +421,7 @@ For example:
 
 is compiled to:
 
+    !!!css
     .funky {
       font-family: fantasy;
       font-size: 30em;
@@ -415,12 +434,14 @@ that begins with a Sass-meaningful character,
 you can escape it with a backslash (`\`).
 For example:
 
+    !!!sass
     #main
       \+div
         clear: both
 
 is compiled to:
 
+    !!!css
     #main +div {
       clear: both; }
 
@@ -433,6 +454,7 @@ a space, and any arguments to it -
 just like CSS directives.
 For example:
 
+    !!!sass
     @import red.sass
 
 Some directives can also control whether or how many times
@@ -459,23 +481,28 @@ Sass will try to find a Sass file with the given basename in the load paths.
 
 For example,
 
+    !!!sass
     @import foo.sass
 
 or
 
+    !!!sass
     @import foo
 
 would compile to
 
+    !!!css
     .foo {
       color: #f00; }
 
 whereas
 
+    !!!sass
     @import foo.css
 
 would compile to
 
+    !!!css
     @import "foo.css";
 
 #### Partials {#partials}
@@ -490,6 +517,7 @@ For example, you might have `_colors.sass`.
 Then no `_colors.css` file would be created,
 and you can do
 
+    !!!sass
     @import colors.sass
 
 ### `@debug`
@@ -500,10 +528,12 @@ It's useful for debugging Sass files
 that have complicated SassScript going on.
 For example:
 
+    !!!sass
     @debug 10em + 12em
 
 outputs:
 
+    !!!text
     Line 1 DEBUG: 22em
 
 ### `@font-face`, `@media`, etc.
@@ -511,18 +541,21 @@ outputs:
 Sass behaves as you'd expect for normal CSS @-directives.
 For example:
 
+    !!!sass
     @font-face
       font-family: "Bitstream Vera Sans"
       src: url(http://foo.bar/bvs)
 
 compiles to:
 
+    !!!css
     @font-face {
       font-family: "Bitstream Vera Sans";
       src: url(http://foo.bar/bvs); }
 
 and
 
+    !!!sass
     @media print
       #sidebar
         display: none
@@ -532,6 +565,7 @@ and
 
 compiles to:
 
+    !!!css
     @media print {
       #sidebar {
         display: none; }
@@ -549,6 +583,7 @@ The `@if` statement takes a SassScript expression
 and prints the code nested beneath it if the expression returns
 anything other than `false`:
 
+    !!!sass
     p
       @if 1 + 1 == 2
         border: 1px solid
@@ -557,6 +592,7 @@ anything other than `false`:
 
 is compiled to:
 
+    !!!css
     p {
       border: 1px solid; }
 
@@ -567,6 +603,7 @@ the `@else if` statements are tried in order
 until one succeeds or the `@else` is reached.
 For example:
 
+    !!!sass
     !type = "monster"
     p
       @if !type == "ocean"
@@ -580,6 +617,7 @@ For example:
 
 is compiled to:
 
+    !!!css
     p {
       color: green; }
 
@@ -597,12 +635,14 @@ from `<start>` to `<end>`,
 including `<end>` if `through` is used.
 For example:
 
+    !!!sass
     @for !i from 1 through 3
       .item-#{!i}
         width = 2em * !i
 
 is compiled to:
 
+    !!!css
     .item-1 {
       width: 2em; }
     .item-2 {
@@ -618,6 +658,7 @@ be used to achieve more complex looping than the `@for`
 statement is capable of.
 For example:
 
+    !!!sass
     !i = 6
     @while !i > 0
       .item-#{!i}
@@ -626,6 +667,7 @@ For example:
 
 is compiled to:
 
+    !!!css
     .item-6 {
       width: 12em; }
 
@@ -646,19 +688,23 @@ SassScript can be used as the value for a property
 by using `=` instead of `:`.
 For example:
 
+    !!!sass
     color = #123 + #234
 
 is compiled to:
 
+    !!!css
     color: #357;
 
 For old-style properties, the `=` is added but the `:` is retained.
 For example:
 
+    !!!sass
     :color = #123 + #234
 
 is compiled to:
 
+    !!!css
     color: #357;
 
 ### Interactive Shell
@@ -668,6 +714,7 @@ To launch the shell run the sass command-line with the `-i` option. At the
 prompt, enter any legal SassScript expression to have it evaluated
 and the result printed out for you:
 
+    !!!text
     $ sass -i
     >> "Hello, Sassy World!"
     "Hello, Sassy World!"
@@ -685,11 +732,13 @@ is to set and reference variables.
 Variables begin with exclamation marks,
 and are set like so:
 
+    !!!sass
     !width = 5em
 
 You can then refer to them by putting an equals sign
 after your properties:
 
+    !!!sass
     #main
       width = !width
 
@@ -707,6 +756,7 @@ SassScript supports four data types:
 Any text that doesn't fit into one of those types
 in a SassScript context will cause an error:
 
+    !!!sass
     p
       !width = 5em
       // This will cause an error
@@ -717,6 +767,7 @@ in a SassScript context will cause an error:
 
 is compiled to:
 
+    !!!css
     p {
       border: 5em solid blue;
       border: 5em solid blue; }
@@ -728,11 +779,13 @@ SassScript supports the standard arithmetic operations on numbers
 (`+`, `-`, `*`, `/`, `%`),
 and will automatically convert between units if it can:
 
+    !!!sass
     p
       width = 1in + 8pt
 
 is compiled to:
 
+    !!!css
     p {
       width: 1.111in; }
 
@@ -749,12 +802,14 @@ This means that the operation is performed
 on the red, green, and blue components in turn.
 For example:
 
+    !!!sass
     p
       color = #010203 + #040506
 
 computes `01 + 04 = 05`, `02 + 05 = 07`, and `03 + 06 = 09`,
 and is compiled to:
 
+    !!!css
     p {
       color: #050709; }
 
@@ -762,39 +817,46 @@ Arithmetic operations even work between numbers and colors,
 also piecewise.
 For example:
 
+    !!!sass
     p
       color = #010203 * 2
 
 computes `01 * 2 = 02`, `02 * 2 = 04`, and `03 * 2 = 06`,
 and is compiled to:
 
+    !!!css
     p {
       color: #020406; }
 
 The `+` operation can be used to concatenate strings:
 
+    !!!sass
     p
       cursor = "e" + "-resize"
 
 is compiled to:
 
+    !!!css
     p {
       cursor: e-resize; }
 
 By default, if two values are placed next to one another,
 they are concatenated with a space:
 
+    !!!sass
     p
       margin = 3px + 4px "auto"
 
 is compiled to:
 
+    !!!css
     p {
       margin: 7px auto; }
 
 Within a string of text, #{} style interpolation can be used to
 place dynamic values within the string:
 
+    !!!sass
     p
       border = "#{5px + 10px} solid #ccc"
 
@@ -805,11 +867,13 @@ for boolean values.
 
 Parentheses can be used to affect the order of operations:
 
+    !!!sass
     p
       width = 1em + (2em * 3)
 
 is compiled to:
 
+    !!!css
     p {
       width: 7em; }
 
@@ -818,11 +882,13 @@ is compiled to:
 SassScript defines some useful functions
 that are called using the normal CSS function syntax:
 
+    !!!sass
     p
       color = hsl(0, 100%, 50%)
 
 is compiled to:
 
+    !!!css
     #main {
       color: #ff0000; }
 
@@ -836,6 +902,7 @@ See {Sass::Script::Functions} for more information.
 You can also use SassScript variables in selectors
 and property names using #{} interpolation syntax:
 
+    !!!sass
     !name = foo
     !attr = border
     p.#{!name}
@@ -843,6 +910,7 @@ and property names using #{} interpolation syntax:
 
 is compiled to:
 
+    !!!css
     p.foo {
       border-color: blue; }
 
@@ -855,6 +923,7 @@ but if it doesn't have a value yet, it will be given one.
 
 For example:
 
+    !!!sass
     !content = "First content"
     !content ||= "Second content?"
     !new_content ||= "First time reference"
@@ -865,6 +934,7 @@ For example:
 
 is compiled to:
 
+    !!!css
     #main {
       content: First content;
       new-content: First time reference; }
@@ -882,6 +952,7 @@ classes in your markup.
 To define a mixin you use a slightly modified form of selector syntax.
 For example the `large-text` mixin is defined as follows:
 
+    !!!sass
     =large-text
       font:
         family: Arial
@@ -895,6 +966,7 @@ Anything you can put into a standard selector,
 you can put into a mixin definition.
 For example:
 
+    !!!sass
     =clearfix
       display: inline-block
       &:after
@@ -913,6 +985,7 @@ just prepend a `+` symbol to the name of a mixin defined earlier in the document
 So to inline the `large-text` defined earlier,
 we include the statment `+large-text` in our selector definition thus:
 
+    !!!sass
     .page-title
       +large-text
       padding: 4px
@@ -921,6 +994,7 @@ we include the statment `+large-text` in our selector definition thus:
 
 This will produce the following CSS output:
 
+    !!!css
     .page-title {
       font-family: Arial;
       font-size: 20px;
@@ -935,6 +1009,7 @@ the number that can be included in a particular selector.
 Mixin definitions can also include references to other mixins.
 For example:
 
+    !!!sass
     =compound
       +highlighted-background
       +header-text
@@ -953,6 +1028,7 @@ into the top most level of a document.
 
 Mixins can take arguments which can be used with SassScript:
 
+    !!!sass
     =sexy-border(!color)
       border:
         color = !color
@@ -963,6 +1039,7 @@ Mixins can take arguments which can be used with SassScript:
 
 is compiled to:
 
+    !!!css
     p {
       border-color: #0000ff;
       border-width: 1in;
@@ -970,6 +1047,7 @@ is compiled to:
 
 Mixins can also specify default values for their arguments:
 
+    !!!sass
     =sexy-border(!color, !width = 1in)
       border:
         color = !color
@@ -980,6 +1058,7 @@ Mixins can also specify default values for their arguments:
 
 is compiled to:
 
+    !!!css
     p {
       border-color: #0000ff;
       border-width: 1in;
@@ -998,6 +1077,7 @@ These comments output to the document as CSS comments,
 and thus use the same opening sequence: `/*`.
 For example:
 
+    !!!sass
     /* A very awesome rule.
     #awesome.rule
       /* An equally awesome property.
@@ -1005,6 +1085,7 @@ For example:
 
 becomes
 
+    !!!css
     /* A very awesome rule. */
     #awesome.rule {
       /* An equally awesome property. */
@@ -1012,6 +1093,7 @@ becomes
 
 You can also nest content beneath loud comments. For example:
 
+    !!!sass
     #pbj
       /* This rule describes
         the styling of the element
@@ -1022,6 +1104,7 @@ You can also nest content beneath loud comments. For example:
 
 becomes
 
+    !!!css
     #pbj {
       /* This rule describes
        * the styling of the element
@@ -1039,6 +1122,7 @@ Simply use the familiar C-style notation for a one-line comment, `//`,
 at the normal indentation level and all text following it won't be output.
 For example:
 
+    !!!sass
     // A very awesome rule.
     #awesome.rule
       // An equally awesome property.
@@ -1046,12 +1130,14 @@ For example:
 
 becomes
 
+    !!!css
     #awesome.rule {
       awesomeness: very; }
 
 You can also nest text beneath a comment to comment out a whole block.
 For example:
 
+    !!!sass
     // A very awesome rule
     #awesome.rule
       // Don't use these properties
@@ -1061,6 +1147,7 @@ For example:
 
 becomes
 
+    !!!css
     #awesome.rule {
       color: red; }
 
@@ -1085,6 +1172,7 @@ but the indentation isn't constant.
 Each rule is indented based on how deeply it's nested.
 For example:
 
+    !!!css
     #main {
       color: #fff;
       background-color: #000; }
@@ -1109,6 +1197,7 @@ Properties are indented within the rules,
 but the rules aren't indented in any special way.
 For example:
 
+    !!!css
     #main {
       color: #fff;
       background-color: #000;
@@ -1134,6 +1223,7 @@ Nested rules are placed next to each other with no newline,
 while groups of rules have newlines between them.
 For example:
 
+    !!!css
     #main { color: #fff; background-color: #000; }
     #main p { width: 10em; }
 
@@ -1147,4 +1237,5 @@ and a newline at the end of the file.
 It's not meant to be human-readable.
 For example:
 
+    !!!css
     #main{color:#fff;background-color:#000}#main p{width:10em}.huge{font-size:10em;font-weight:bold;text-decoration:underline}

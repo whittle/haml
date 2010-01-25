@@ -30,6 +30,7 @@
 * Allow `if` statements with no content followed by `else` clauses.
   For example:
 
+    !!!haml
     - if foo
     - else
       bar
@@ -108,14 +109,17 @@ There were no changes made to Haml between versions 2.2.11 and 2.2.12.
 * Fixed a bug where template text was escaped when there was interpolation in a line
   and the `:escape_html` option was enabled. For example:
 
+      !!!text
       Foo &lt; Bar #{"<"} Baz
 
   with `:escape_html` used to render as
 
+      !!!text
       Foo &amp;lt; Bar &lt; Baz
 
   but now renders as
 
+      !!!text
       Foo &lt; Bar &lt; Baz
 
 ### Rails XSS Protection
@@ -185,6 +189,7 @@ There are several components to this:
 * Allow `end` to be used for silent script when it's followed by code.
   For example:
 
+      !!!haml
       - form_for do
         ...
       - end if @show_form
@@ -231,6 +236,7 @@ Haml 2.2 introduces a new syntax for attributes
 based on the HTML syntax.
 For example:
 
+    !!!haml
     %a(href="http://haml-lang.com" title="Haml's so cool!")
       %img(src="/images/haml.png" alt="Haml")
 
@@ -252,10 +258,12 @@ Ruby variables can be used as attribute values by omitting quotes.
 Local variables or instance variables can be used.
 For example:
 
+    !!!haml
     %a(title=@title href=href) Stuff
 
 This is the same as:
 
+    !!!haml
     %a{:title => @title, :href => href} Stuff
 
 Because there are no commas separating attributes,
@@ -263,6 +271,7 @@ more complicated expressions aren't allowed.
 You can use `#{}` interpolation to insert complicated expressions
 in a HTML-style attribute, though:
 
+    !!!haml
     %span(class="widget_#{@widget.number}")
 
 #### Multiline Attributes
@@ -276,13 +285,15 @@ Often a tag will simply have a lot of attributes, and in this case
 it makes sense to allow overflow.
 You can now stretch an attribute hash across multiple lines:
 
+    !!!haml
     %script{:type => "text/javascript",
             :src  => "javascripts/script_#{2 + 7}"}
 
 This also works for HTML-style attributes:
 
-        %script(type="text/javascript"
-            src="javascripts/script_#{2 + 7}")
+    !!!haml
+    %script(type="text/javascript"
+        src="javascripts/script_#{2 + 7}")
 
 Note that for hash-style attributes, the newlines must come after commas.
 
@@ -294,6 +305,7 @@ In Haml 2.2, the `==` is unnecessary;
 `#{}` can be used in any text.
 For example:
 
+    !!!haml
     %p This is a really cool #{h what_is_this}!
     But is it a #{h what_isnt_this}?
 
@@ -301,6 +313,7 @@ In addition, to {file:HAML_REFERENCE.md#escaping_html escape} or {file:HAML_REFE
 the interpolated code, you can just add `&` or `!`, respectively,
 to the beginning of the line:
 
+    !!!haml
     %p& This is a really cool #{what_is_this}!
     & But is it a #{what_isnt_this}?
 

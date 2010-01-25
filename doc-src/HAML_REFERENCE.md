@@ -29,10 +29,12 @@ as a plugin for Ruby on Rails,
 and as a standalone Ruby module.
 The first step for all of these is to install the Haml gem:
 
+    !!!sh
     gem install haml
 
 To run Haml from the command line, just use
 
+    !!!sh
     haml input.haml output.html
 
 Use `haml --help` for full documentation.
@@ -41,6 +43,7 @@ Use `haml --help` for full documentation.
 
 To enable Haml as a Rails plugin, run
 
+    !!!sh
     haml --rails path/to/rails/app
 
 Once it's installed, all view files with the `".html.haml"` extension
@@ -60,6 +63,8 @@ For example (this example uses Rails, but the principle for Merb is the same):
       end
     end
 
+{.just-here-to-make-this-a-new-code-block}
+    !!!haml
     -# file: app/views/movies/index.haml
 
     #content
@@ -69,6 +74,7 @@ For example (this example uses Rails, but the principle for Merb is the same):
 
 may be compiled to:
 
+    !!!html
     <div id='content'>
       <div class='title'>
         <h1>Teen Wolf</h1>
@@ -100,6 +106,7 @@ In addition, string input is escaped unless it's HTML safe.
 Haml can also be used completely separately from Rails and ActionView.
 To do this, install the gem with RubyGems:
 
+    !!!sh
     gem install haml
 
 You can then use it by including the "haml" gem in Ruby code,
@@ -208,12 +215,14 @@ Any Haml line that's not interpreted as something else
 is taken to be plain text, and passed through unmodified.
 For example:
 
+    !!!haml
     %gee
       %whiz
         Wow this is cool!
 
 is compiled to:
 
+    !!!html
     <gee>
       <whiz>
         Wow this is cool!
@@ -226,11 +235,13 @@ or you're converting a file line-by-line,
 you can just include it as-is.
 For example:
 
+    !!!haml
     %p
       <div id="blah">Blah!</div>
 
 is compiled to:
 
+    !!!html
     <p>
       <div id="blah">Blah!</div>
     </p>
@@ -241,12 +252,14 @@ The backslash character escapes the first character of a line,
 allowing use of otherwise interpreted characters as plain text.
 For example:
 
+    !!!haml
     %title
       = @title
       \= @title
 
 is compiled to:
 
+    !!!html
     <title>
       MyPage
       = @title
@@ -264,12 +277,14 @@ and text to be rendered inside the element.
 It creates an element in the form of `<element></element>`.
 For example:
 
+    !!!haml
     %one
       %two
         %three Hey there
 
 is compiled to:
 
+    !!!html
     <one>
       <two>
         <three>Hey there</three>
@@ -290,10 +305,12 @@ will be replaced by appropriate escape sequences.
 The hash is placed after the tag is defined.
 For example:
 
+    !!!haml
     %html{:xmlns => "http://www.w3.org/1999/xhtml", "xml:lang" => "en", :lang => "en"}
 
 is compiled to:
 
+    !!!html
     <html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'></html>
 
 Attribute hashes can also be stretched out over multiple lines
@@ -301,11 +318,13 @@ to accommodate many attributes.
 However, newlines may only be placed immediately after commas.
 For example:
 
+    !!!haml
     %script{:type => "text/javascript",
             :src  => "javascripts/script_#{2 + 7}"}
 
 is compiled to:
 
+    !!!html
     <script src='javascripts/script_9' type='text/javascript'></script>
 
 #### HTML-style Attributes: `()`
@@ -314,16 +333,19 @@ Haml also supports a terser, less Ruby-specific attribute syntax
 based on HTML's attributes.
 These are used with parentheses instead of brackets, like so:
 
+    !!!haml
     %html(xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en")
 
 Ruby variables can be used by omitting the quotes.
 Local variables or instance variables can be used.
 For example:
 
+    !!!haml
     %a(title=@title href=href) Stuff
 
 This is the same as:
 
+    !!!haml
     %a{:title => @title, :href => href} Stuff
 
 Because there are no commas separating attributes, though,
@@ -331,16 +353,19 @@ more complicated expressions aren't allowed.
 For those you'll have to use the `{}` syntax.
 You can, however, use both syntaxes together:
 
+    !!!haml
     %a(title=@title){:href => @link.href} Stuff
 
 You can also use `#{}` interpolation to insert complicated expressions
 in a HTML-style attribute:
 
+    !!!haml
     %span(class="widget_#{@widget.number}")
 
 HTML-style attributes can be stretched across multiple lines
 just like hash-style attributes:
 
+    !!!haml
     %script(type="text/javascript"
             src="javascripts/script_#{2 + 7}")
 
@@ -356,10 +381,12 @@ For example, {Haml::Helpers} defines the following method:
 
 This can then be used in Haml, like so:
 
+    !!!haml
     %html{html_attrs('fr-fr')}
 
 This is compiled to:
 
+    !!!html
     <html lang='fr-fr' xml:lang='fr-fr' xmlns='http://www.w3.org/1999/xhtml'>
     </html>
 
@@ -379,10 +406,12 @@ For example, if you defined
 
 then
 
+    !!!haml
     %sandwich{hash1, hash2, :delicious => true}/
 
 would compile to:
 
+    !!!html
     <sandwich bread='whole wheat' delicious='true' filling='peanut butter and jelly' />
 
 Note that the Haml attributes list has the same syntax as a Ruby method call.
@@ -397,33 +426,40 @@ are "boolean" in the sense that their values don't matter -
 it only matters whether or not they're present.
 In HTML (but not XHTML), these attributes can be written as
 
+    !!!html
     <input selected>
 
 To do this in Haml using hash-style attributes, just assign a Ruby
 `true` value to the attribute:
 
+    !!!haml
     %input{:selected => true}
 
 In XHTML, the only valid value for these attributes is the name of the
 attribute.  Thus this will render in XHTML as
 
+    !!!html
     <input selected='selected'>
 
 To set these attributes to false, simply assign them to a Ruby false value.
 In both XHTML and HTML
 
+    !!!haml
     %input{:selected => false}
 
 will just render as
 
+    !!!html
     <input>
 
 HTML-style boolean attributes can be written just like HTML:
 
+    !!!haml
     %input(selected)
 
 or using `true` and `false`:
 
+    !!!haml
     %input(selected=true)
 
 ### Class and ID: `.` and `#`
@@ -436,6 +472,7 @@ by chaining the class names together with periods.
 They are placed immediately after the tag and before an attributes hash.
 For example:
 
+    !!!haml
     %div#things
       %span#rice Chicken Fried
       %p.beans{ :food => 'true' } The magical fruit
@@ -443,6 +480,7 @@ For example:
 
 is compiled to:
 
+    !!!html
     <div id='things'>
       <span id='rice'>Chicken Fried</span>
       <p class='beans' food='true'>The magical fruit</p>
@@ -451,6 +489,7 @@ is compiled to:
 
 And,
 
+    !!!haml
     #content
       .articles
         .article.title Doogie Howser Comes Out
@@ -460,6 +499,7 @@ And,
 
 is compiled to:
 
+    !!!html
     <div id='content'>
       <div class='articles'>
         <div class='article title'>Doogie Howser Comes Out</div>
@@ -477,18 +517,21 @@ If you only define a class and/or id using `.` or `#`,
 a div is automatically used.
 For example:
 
+    !!!haml
     #collection
       .item
         .description What a cool item!
 
 is the same as:
 
+    !!!haml
     %div#collection
       %div.item
         %div.description What a cool item!
 
 and is compiled to:
 
+    !!!html
     <div id='collection'>
       <div class='item'>
         <div class='description'>What a cool item!</div>
@@ -501,11 +544,13 @@ The forward slash character, when placed at the end of a tag definition,
 causes the tag to be self-closed.
 For example:
 
+    !!!haml
     %br/
     %meta{'http-equiv' => 'Content-Type', :content => 'text/html'}/
 
 is compiled to:
 
+    !!!html
     <br />
     <meta http-equiv='Content-Type' content='text/html' />
 
@@ -514,11 +559,13 @@ Some tags are automatically closed, as long as they have no content.
 This list can be customized by setting the [`:autoclose`](#autoclose-option) option.
 For example:
 
+    !!!haml
     %br
     %meta{'http-equiv' => 'Content-Type', :content => 'text/html'}
 
 is also compiled to:
 
+    !!!html
     <br />
     <meta http-equiv='Content-Type' content='text/html' />
 
@@ -535,37 +582,44 @@ after class, id, and attribute declarations
 but before `/` or `=`.
 For example:
 
+    !!!haml
     %blockquote<
       %div
         Foo!
 
 is compiled to:
 
+    !!!html
     <blockquote><div>
       Foo!
     </div></blockquote>
 
 And:
 
+    !!!haml
     %img
     %img>
     %img
 
 is compiled to:
 
+    !!!html
     <img /><img /><img />
 
 And:
 
+    !!!haml
     %p<= "Foo\nBar"
 
 is compiled to:
 
+    !!!html
     <p>Foo
     Bar</p>
 
 And finally:
 
+    !!!haml
     %img
     %pre><
       foo
@@ -574,6 +628,7 @@ And finally:
 
 is compiled to:
 
+    !!!html
     <img /><pre>foo
     bar</pre><img />
 
@@ -596,6 +651,8 @@ For example:
       @user = CrazyUser.find(15)
     end
 
+{.file-separator}
+    !!!haml
     -# file: app/views/users/show.haml
 
     %div[@user, :greeting]
@@ -604,6 +661,7 @@ For example:
 
 is compiled to:
 
+    !!!html
     <div class='greeting_crazy_user' id='greeting_crazy_user_15'>
       <bar class='fixnum' id='fixnum_581' />
       Hello!
@@ -616,6 +674,7 @@ you can have a document type or XML prolog generated automatically
 by including the characters `!!!`.
 For example:
 
+    !!!haml
     !!! XML
     !!!
     %html
@@ -627,6 +686,7 @@ For example:
 
 is compiled to:
 
+    !!!xml
     <?xml version='1.0' encoding='utf-8' ?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html>
@@ -694,10 +754,12 @@ you can specify which encoding should appear
 in the XML prolog in a similar way.
 For example:
 
+    !!!haml
     !!! XML iso-8859-1
 
 is compiled to:
 
+    !!!xml
     <?xml version='1.0' encoding='iso-8859-1' ?>
 
 ## Comments
@@ -712,12 +774,14 @@ The forward slash character, when placed at the beginning of a line,
 wraps all text after it in an HTML comment.
 For example:
 
+    !!!haml
     %peanutbutterjelly
       / This is the peanutbutterjelly element
       I like sandwiches!
 
 is compiled to:
 
+    !!!html
     <peanutbutterjelly>
       <!-- This is the peanutbutterjelly element -->
       I like sandwiches!
@@ -725,6 +789,7 @@ is compiled to:
 
 The forward slash can also wrap indented sections of code. For example:
 
+    !!!haml
     /
       %p This doesn't render...
       %div
@@ -732,6 +797,7 @@ The forward slash can also wrap indented sections of code. For example:
 
 is compiled to:
 
+    !!!html
     <!--
       <p>This doesn't render...</p>
       <div>
@@ -745,12 +811,14 @@ You can also use [Internet Explorer conditional comments](http://www.quirksmode.
 by enclosing the condition in square brackets after the `/`.
 For example:
 
+    !!!haml
     /[if IE]
       %a{ :href => 'http://www.mozilla.com/en-US/firefox/' }
         %h1 Get Firefox
 
 is compiled to:
 
+    !!!html
     <!--[if IE]>
       <a href='http://www.mozilla.com/en-US/firefox/'>
         <h1>Get Firefox</h1>
@@ -766,12 +834,14 @@ at all.
 
 For example:
 
+    !!!haml
     %p foo
     -# This is a comment
     %p bar
 
 is compiled to:
 
+    !!!html
     <p>foo</p>
     <p>bar</p>
 
@@ -779,6 +849,7 @@ You can also nest text beneath a silent comment.
 None of this text will be rendered.
 For example:
 
+    !!!haml
     %p foo
     -#
       This won't be displayed
@@ -787,6 +858,7 @@ For example:
 
 is compiled to:
 
+    !!!html
     <p>foo</p>
     <p>bar</p>
 
@@ -798,12 +870,14 @@ The equals character is followed by Ruby code.
 This code is evaluated and the output is inserted into the document.
 For example:
 
+    !!!haml
     %p
       = ['hi', 'there', 'reader!'].join " "
       = "yo"
 
 is compiled to:
 
+    !!!html
     <p>
       hi there reader!
       yo
@@ -812,19 +886,23 @@ is compiled to:
 If the [`:escape_html`](#escape_html-option) option is set, `=` will sanitize any
 HTML-sensitive characters generated by the script. For example:
 
+    !!!haml
     = '<script>alert("I\'m evil!");</script>'
 
 would be compiled to
 
+    !!!html
     &lt;script&gt;alert(&quot;I'm evil!&quot;);&lt;/script&gt;
 
 `=` can also be used at the end of a tag to insert Ruby code within that tag.
 For example:
 
+    !!!haml
     %p= "hello"
 
 would be compiled to
 
+    !!!html
     <p>hello</p>
 
 Note that it's illegal to nest code within a tag that ends with `=`.
@@ -840,6 +918,7 @@ to the Controller, the Helper, or partials.**
 
 For example:
 
+    !!!haml
     - foo = "hello"
     - foo << " there"
     - foo << " you!"
@@ -847,6 +926,7 @@ For example:
 
 is compiled to:
 
+    !!!html
     <p>
       hello there you!
     </p>
@@ -861,12 +941,14 @@ It ends when the indentation decreases
 (as long as it's not an `else` clause or something similar).
 For example:
 
+    !!!haml
     - (42...47).each do |i|
       %p= i
     %p See, I can count!
 
 is compiled to:
 
+    !!!html
     <p>42</p>
     <p>43</p>
     <p>44</p>
@@ -876,6 +958,7 @@ is compiled to:
 
 Another example:
 
+    !!!haml
     %p
       - case 2
       - when 1
@@ -887,6 +970,7 @@ Another example:
 
 is compiled to:
 
+    !!!html
     <p>
       2?
     </p>
@@ -896,14 +980,17 @@ is compiled to:
 `~` works just like `=`, except that it runs {Haml::Helpers#find\_and\_preserve} on its input.
 For example,
 
+    !!!haml
     ~ "Foo\n<pre>Bar\nBaz</pre>"
 
 is the same as:
 
+    !!!haml
     = find_and_preserve("Foo\n<pre>Bar\nBaz</pre>")
 
 and is compiled to:
 
+    !!!html
     Foo
     <pre>Bar&#x000A;Baz</pre>
 
@@ -915,26 +1002,31 @@ Ruby code can also be interpolated within plain text using `#{}`,
 similarly to Ruby string interpolation.
 For example,
 
+    !!!haml
     %p This is #{h quality} cake!
 
 is the same as
 
+    !!!haml
     %p= "This is the #{h quality} cake!"
 
 and might compile to
 
+    !!!html
     <p>This is scrumptious cake!</p>
 
 Backslashes can be used to escape `#{` strings,
 but they don't act as escapes anywhere else in the string.
 For example:
 
+    !!!haml
     %p
       Look at \\#{h word} lack of backslash: \#{foo}
       And yon presence thereof: \{foo}
 
 might compile to
 
+    !!!haml
     <p>
       Look at \yon lack of backslash: #{foo}
       And yon presence thereof: \{foo}
@@ -943,6 +1035,7 @@ might compile to
 Interpolation can also be used within [filters](#filters).
 For example:
 
+    !!!haml
     :javascript
       $(document).ready(function() {
         alert(#{@message.to_json});
@@ -950,6 +1043,7 @@ For example:
 
 might compile to
 
+    !!!html
     <script type='text/javascript'>
       //<![CDATA[
         $(document).ready(function() {
@@ -965,10 +1059,12 @@ evaluates Ruby code just like the equals without the ampersand,
 but sanitizes any HTML-sensitive characters in the result of the code.
 For example:
 
+    !!!haml
     &= "I like cheese & crackers"
 
 compiles to
 
+    !!!html
     I like cheese &amp; crackers
 
 If the [`:escape_html`](#escape_html-option) option is set,
@@ -977,10 +1073,12 @@ If the [`:escape_html`](#escape_html-option) option is set,
 `&` can also be used on its own so that `#{}` interpolation is escaped.
 For example,
 
+    !!!haml
     & I like #{"cheese & crackers"}
 
 compiles to
 
+    !!!html
     I like cheese &amp; crackers
 
 ### Unescaping HTML: `!=` {#unescaping_html}
@@ -994,21 +1092,25 @@ However, if the [`:escape_html`](#escape_html-option) option is set,
 `=` will sanitize the HTML, but `!=` still won't.
 For example, if `:escape_html` is set:
 
+    !!!haml
     = "I feel <strong>!"
     != "I feel <strong>!"
 
 compiles to
 
+    !!!html
     I feel &lt;strong&gt;!
     I feel <strong>!
 
 `!` can also be used on its own so that `#{}` interpolation is unescaped.
 For example,
 
+    !!!haml
     ! I feel #{"<strong>"}!
 
 compiles to
 
+    !!!html
     I feel <strong>!
 
 ## Filters {#filters}
@@ -1019,6 +1121,7 @@ to another filtering program and add the result to the output of Haml.
 The syntax is simply a colon followed by the name of the filter.
 For example,
 
+    !!!haml
     %p
       :markdown
         Textile
@@ -1028,6 +1131,7 @@ For example,
 
 is compiled to
 
+    !!!html
     <p>
       <h1>Textile</h1>
 
@@ -1037,6 +1141,7 @@ is compiled to
 Filters can have Ruby code interpolated with `#{}`.
 For example,
 
+    !!!haml
     - flavor = "raspberry"
     #content
       :textile
@@ -1044,6 +1149,7 @@ For example,
 
 is compiled to
 
+    !!!html
     <div id='content'>
       <p>I <strong>really</strong> prefer <em>raspberry</em> jam.</p>
     </div>
@@ -1131,6 +1237,7 @@ will be evaluated as though they were on the same line.
 should end wit `|`.**
 For example:
 
+    !!!haml
     %whoo
       %hoo= h(                       |
         "I think this might get " +  |
@@ -1142,6 +1249,7 @@ For example:
 
 is compiled to:
 
+    !!!html
     <whoo>
       <hoo>I think this might get pretty long so I should probably make it multiline so it doesn't look awful.</hoo>
       <p>This is short</p>

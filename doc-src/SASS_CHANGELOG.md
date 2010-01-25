@@ -133,6 +133,7 @@ There were no changes made to Sass between versions 2.2.12 and 2.2.13.
 * Add support for attribute selectors with spaces around the `=`.
   For example:
 
+      !!!sass
       a[href = http://google.com]
         color: blue
 
@@ -237,6 +238,7 @@ Sass Mixins now accept any number of arguments. To define a mixin with
 arguments, specify the arguments as a comma-delimited list of
 variables like so:
 
+    !!!sass
     =my-mixin(!arg1, !arg2, !arg3)
 
 As before, the definition of the mixin is indented below the mixin
@@ -245,12 +247,14 @@ and will be bound to the values passed to the mixin when it is
 invoked.  Trailing arguments may have default values as part of the
 declaration:
 
+    !!!sass
     =my-mixin(!arg1, !arg2 = 1px, !arg3 = blue)
 
 In the example above, the mixin may be invoked by passing 1, 2 or 3
 arguments to it. A similar syntax is used to invoke a mixin that
 accepts arguments:
 
+    !!!sass
     div.foo
       +my-mixin(1em, 3px)
 
@@ -260,6 +264,7 @@ The default values for mixin arguments are evaluated in the global
 context at the time when the mixin is invoked, they may also reference
 the previous arguments in the declaration. For example:
 
+    !!!sass
     !default_width = 30px
     =my-fancy-mixin(!width = !default_width, !height = !width)
       width= !width
@@ -281,6 +286,7 @@ the previous arguments in the declaration. For example:
 
 compiles to:
 
+    !!!css
     .default-box {
       width: 30px;
       height: 30px; }
@@ -304,6 +310,7 @@ The sass command line option -i now allows you to quickly and
 interactively experiment with SassScript expressions. The value of the
 expression you enter will be printed out after each line. Example:
 
+    !!!text
     $ sass -i
     >> 5px
     5px
@@ -342,6 +349,7 @@ While Sass has long supported numbers with units, it now has a much
 deeper understanding of them. The following are examples of legal
 numbers in SassScript:
 
+    !!!text
     0, 1000, 6%, -2px, 5pc, 20em, or 2foo.
 
 Numbers of the same unit may always be added and subtracted. Numbers
@@ -351,6 +359,7 @@ non-comparable units may not be added nor subtracted -- any attempt to
 do so will cause an error. However, a unitless number takes on the
 unit of the other number during a mathematical operation. For example:
 
+    !!!text
     >> 3mm + 4cm
     43mm
     >> 4cm + 3mm
@@ -368,6 +377,7 @@ Sass allows compound units to be stored in any intermediate form, but
 will raise an error if you try to emit a compound unit into your css
 file.
 
+    !!!text
     >> !em_ratio = 1em / 16px
     0.063em/px
     >> !em_ratio * 32px
@@ -382,7 +392,8 @@ shorthand hexadecimal, the rgb function, or the hsl function. When
 outputting a color into css, the color name is used, if any, otherwise
 it is emitted as hexadecimal value. Examples:
 
-    > #fff
+    !!!text
+    >> #fff
     white
     >> white
     white
@@ -399,6 +410,7 @@ Math on color objects is performed piecewise on the rgb
 components. However, these operations rarely have meaning in the
 design domain (mostly they make sense for gray-scale colors).
 
+    !!!text
     >> #aaa + #123
     #bbccdd
     >> #333 * 2
@@ -410,6 +422,7 @@ Boolean objects can be created by comparison operators or via the
 `true` and `false` keywords.  Booleans can be combined using the
 `and`, `or`, and `not` keywords.
 
+    !!!text
     >> true
     true
     >> true and false
@@ -444,12 +457,14 @@ the current number into the variable specified for each loop. The
 number, the `to` keyword means that it will stop just before that
 number.
 
+    !!!sass
     @for !x from 1px through 5px
       .border-#{!x}
         border-width= !x
 
 compiles to:
 
+    !!!css
     .border-1px {
       border-width: 1px; }
 
@@ -471,6 +486,7 @@ The branching directives `@if`, `@else if`, and `@else` let you select
 between several branches of sass to be emitted, based on the result of
 a SassScript expression. Example:
 
+    !!!sass
     !type = "monster"
     p
       @if !type == "ocean"
@@ -484,6 +500,7 @@ a SassScript expression. Example:
 
 is compiled to:
 
+    !!!css
     p {
       color: green; }
 
@@ -492,6 +509,7 @@ is compiled to:
 The `@while` directive lets you iterate until a condition is
 met. Example:
 
+    !!!sass
     !i = 6
     @while !i > 0
       .item-#{!i}
@@ -500,6 +518,7 @@ met. Example:
 
 is compiled to:
 
+    !!!css
     .item-6 {
       width: 12em; }
 
@@ -520,6 +539,7 @@ value stored previously.
 In this code, the `!local_var` variable is scoped and hidden from
 other higher level scopes or sibling scopes:
 
+    !!!sass
     .foo
       .bar
         !local_var = 1px
@@ -533,6 +553,7 @@ other higher level scopes or sibling scopes:
 In this example, since the `!global_var` variable is first declared at
 a higher scope, it is shared among all lower scopes:
 
+    !!!sass
     !global_var = 1px
     .foo
       .bar
@@ -544,6 +565,7 @@ a higher scope, it is shared among all lower scopes:
 
 compiles to:
 
+    !!!css
     .foo {
       width: 2px; }
       .foo .bar {
@@ -560,6 +582,7 @@ of dynamic values when dealing with compound properties. Using
 interpolation, the result of a SassScript expression can be placed
 anywhere:
 
+    !!!sass
     !x = 1
     !d = 3
     !property = "border"
@@ -569,6 +592,7 @@ anywhere:
 
 is compiled to:
 
+    !!!css
     div.border {
       border: 4px solid;
       border-color: blue; }
@@ -578,11 +602,13 @@ is compiled to:
 SassScript defines some useful functions that are called using the
 normal CSS function syntax:
 
+    !!!sass
     p
       color = hsl(0, 100%, 50%)
 
 is compiled to:
 
+    !!!css
     #main {
       color: #ff0000; }
 
@@ -618,10 +644,12 @@ value of that expression to the terminal (stderr).
 
 Example:
 
+    !!!sass
     @debug 1px + 2px
 
 During compilation the following will be printed:
 
+    !!!text
     Line 1 DEBUG: 3px
 
 #### Ruby 1.9 Support
