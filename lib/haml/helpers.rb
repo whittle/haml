@@ -143,22 +143,26 @@ MESSAGE
     # This creates a list of the results of the block.
     # For example:
     #
+    #     !!!haml
     #     = list_of([['hello'], ['yall']]) do |i|
     #       = i[0]
     #
     # Produces:
     #
+    #     !!!html
     #     <li>hello</li>
     #     <li>yall</li>
     #
     # And
     #
+    #     !!!haml
     #     = list_of({:title => 'All the stuff', :description => 'A book about all the stuff.'}) do |key, val|
     #       %h3= key.humanize
     #       %p= val
     #
     # Produces:
     #
+    #     !!!html
     #     <li>
     #       <h3>Title</h3>
     #       <p>All the stuff</p>
@@ -191,10 +195,12 @@ MESSAGE
     # attributes of the `html` HTML element.
     # For example,
     #
+    #     !!!haml
     #     %html{html_attrs}
     #
     # becomes
     #
+    #     !!!html
     #     <html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en-US' lang='en-US'>
     #
     # @param lang [String] The value of `xml:lang` and `lang`
@@ -207,6 +213,7 @@ MESSAGE
     # to the lines of the template.
     # For example:
     #
+    #     !!!haml
     #     %h1 foo
     #     - tab_up
     #     %p bar
@@ -215,6 +222,7 @@ MESSAGE
     #
     # Produces:
     #
+    #     !!!html
     #     <h1>foo</h1>
     #       <p>bar</p>
     #     <strong>baz</strong>
@@ -238,20 +246,24 @@ MESSAGE
     # with no whitespace in between.
     # For example:
     #
+    #     !!!haml
     #     = surround '(', ')' do
     #       %a{:href => "food"} chicken
     #
     # Produces:
     #
+    #     !!!html
     #     (<a href='food'>chicken</a>)
     #
     # and
     #
+    #     !!!haml
     #     = surround '*' do
     #       %strong angry
     #
     # Produces:
     #
+    #     !!!html
     #     *<strong>angry</strong>*
     #
     # @param front [String] The string to add before the Haml
@@ -267,11 +279,13 @@ MESSAGE
     # with no whitespace between.
     # For example:
     #
+    #     !!!haml
     #     = precede '*' do
     #       %span.small Not really
     #
     # Produces:
     #
+    #     !!!html
     #     *<span class='small'>Not really</span>
     #
     # @param str [String] The string to add before the Haml
@@ -284,12 +298,14 @@ MESSAGE
     # with no whitespace between.
     # For example:
     #
+    #     !!!haml
     #     click
     #     = succeed '.' do
     #       %a{:href=>"thing"} here
     #
     # Produces:
     #
+    #     !!!html
     #     click
     #     <a href='thing'>here</a>.
     #
@@ -304,6 +320,7 @@ MESSAGE
     # and returns it as a string.
     # For example, after the following,
     #
+    #     !!!haml
     #     .foo
     #       - foo = capture_haml(13) do |a|
     #         %p= a
@@ -393,6 +410,7 @@ END
     #
     # outputs
     #
+    #     !!!html
     #     <table>
     #       <tr>
     #         <td class='cell'>

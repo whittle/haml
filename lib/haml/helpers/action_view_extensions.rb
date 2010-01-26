@@ -13,20 +13,24 @@ module Haml
       # This can be used to target styles specifically at this action or controller.
       # For example, if the current action were `EntryController#show`,
       #
+      #     !!!haml
       #     %div{:class => page_class} My Div
       #
       # would become
       #
+      #     !!!html
       #     <div class="entry show">My Div</div>
       #
       # Then, in a stylesheet (shown here as {Sass}),
       # you could refer to this specific action:
       #
+      #     !!!haml
       #     .entry.show
       #       font-weight: bold
       #
       # or to all actions in the entry controller:
       #
+      #     !!!haml
       #     .entry
       #       color: #00f
       #

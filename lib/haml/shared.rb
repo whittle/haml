@@ -24,6 +24,7 @@ module Haml
     # Moves a scanner through a balanced pair of characters.
     # For example:
     #
+    #     !!!text
     #     Foo (Bar (Baz bang) bop) (Bang (bop bip))
     #     ^                       ^
     #     from                    to

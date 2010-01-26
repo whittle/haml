@@ -87,10 +87,11 @@ module Haml
     # lowering the indentation with one of these won't end the block.
     # For example:
     #
-    #   - if foo
-    #     %p yes!
-    #   - else
-    #     %p no!
+    #     !!!haml
+    #     - if foo
+    #       %p yes!
+    #     - else
+    #       %p no!
     #
     # The block is ended after `%p no!`, because `else`
     # is a member of this array.
