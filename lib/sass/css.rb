@@ -219,11 +219,13 @@ MESSAGE
 
     # Transform
     #
+    #     !!!sass
     #     foo, bar, baz
     #       color: blue
     #
     # into
     #
+    #     !!!sass
     #     foo
     #       color: blue
     #     bar
@@ -246,6 +248,7 @@ MESSAGE
 
     # Make rules use parent refs so that
     #
+    #     !!!sass
     #     foo
     #       color: green
     #     foo.bar
@@ -253,6 +256,7 @@ MESSAGE
     #
     # becomes
     #
+    #     !!!sass
     #     foo
     #       color: green
     #       &.bar
@@ -261,6 +265,7 @@ MESSAGE
     # This has the side effect of nesting rules,
     # so that
     #
+    #     !!!sass
     #     foo
     #       color: green
     #     foo bar
@@ -270,6 +275,7 @@ MESSAGE
     #
     # becomes
     #
+    #     !!!sass
     #     foo
     #       color: green
     #       & bar
@@ -302,12 +308,14 @@ MESSAGE
 
     # Remove useless parent refs so that
     #
+    #     !!!sass
     #     foo
     #       & bar
     #         color: blue
     #
     # becomes
     #
+    #     !!!sass
     #     foo
     #       bar
     #         color: blue
@@ -324,23 +332,27 @@ MESSAGE
 
     # Flatten rules so that
     #
+    #     !!!sass
     #     foo
     #       bar
     #         color: red
     #
     # becomes
     #
+    #     !!!sass
     #     foo bar
     #       color: red
     #
     # and
     #
+    #     !!!sass
     #     foo
     #       &.bar
     #         color: blue
     #
     # becomes
     #
+    #     !!!sass
     #     foo.bar
     #       color: blue
     #
@@ -371,6 +383,7 @@ MESSAGE
 
     # Transform
     #
+    #     !!!sass
     #     foo
     #       bar
     #         color: blue
@@ -379,6 +392,7 @@ MESSAGE
     #
     # into
     #
+    #     !!!sass
     #     foo
     #       bar, baz
     #         color: blue

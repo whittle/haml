@@ -2,6 +2,7 @@ module Sass::Script
   # Methods in this module are accessible from the SassScript context.
   # For example, you can write
   #
+  #     !!!sass
   #     !color = hsl(120, 100%, 50%)
   #
   # and it will call {Sass::Script::Functions#hsl}.
@@ -171,6 +172,7 @@ module Sass::Script
     # Converts a decimal number to a percentage.
     # For example:
     #
+    #     !!!sass
     #     percentage(100px / 50px) => 200%
     #
     # @param value [Number] The decimal number to convert to a percentage
@@ -186,6 +188,7 @@ module Sass::Script
     # Rounds a number to the nearest whole number.
     # For example:
     #
+    #     !!!sass
     #     round(10.4px) => 10px
     #     round(10.6px) => 11px
     #
@@ -199,6 +202,7 @@ module Sass::Script
     # Rounds a number up to the nearest whole number.
     # For example:
     #
+    #     !!!sass
     #     ciel(10.4px) => 11px
     #     ciel(10.6px) => 11px
     #
@@ -212,6 +216,7 @@ module Sass::Script
     # Rounds down to the nearest whole number.
     # For example:
     #
+    #     !!!sass
     #     floor(10.4px) => 10px
     #     floor(10.6px) => 10px
     #
@@ -225,6 +230,7 @@ module Sass::Script
     # Finds the absolute value of a number.
     # For example:
     #
+    #     !!!sass
     #     abs(10px) => 10px
     #     abs(-10px) => 10px
     #

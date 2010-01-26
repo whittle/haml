@@ -13,6 +13,7 @@ module Sass::Tree
     # Each string is a selector line, and the lines are meant to be separated by commas.
     # For example,
     #
+    #     !!!text
     #     foo, bar, baz,
     #     bip, bop, bup
     #
@@ -35,6 +36,7 @@ module Sass::Tree
     # currently only parent-refs (represented by `:parent`).
     # For example,
     #
+    #     !!!text
     #     &.foo, bar, baz,
     #     bip, &.bop, bup
     #
