@@ -355,12 +355,12 @@ MESSAGE
       haml_buffer.capture_position = nil
     end
 
-    # @deprecated This will be removed in version 2.4.
+    # @deprecated This will be removed in version 3.0.
     # @see #haml_concat
     def puts(*args)
       warn <<END
 DEPRECATION WARNING:
-The Haml #puts helper is deprecated and will be removed in version 2.4.
+The Haml #puts helper is deprecated and will be removed in version 3.0.
 Use the #haml_concat helper instead.
 END
       haml_concat(*args)
@@ -537,12 +537,12 @@ END
     # @yield A block in which the given buffer should be used
     def with_haml_buffer(buffer)
       @haml_buffer, old_buffer = buffer, @haml_buffer
-      old_buffer.active, was_active = false, old_buffer.active? if old_buffer
-      @haml_buffer.active = true
+      old_buffer.active, old_was_active = false, old_buffer.active? if old_buffer
+      @haml_buffer.active, was_active = true, @haml_buffer.active?
       yield
     ensure
-      @haml_buffer.active = false
-      old_buffer.active = was_active if old_buffer
+      @haml_buffer.active = was_active
+      old_buffer.active = old_was_active if old_buffer
       @haml_buffer = old_buffer
     end
 

@@ -674,7 +674,7 @@ END
         return name, [:dynamic, var]
       end
 
-      re = /((?:\\.|\#[^{]|[^#{quote}\\#])*#?)(#{quote}|#\{)/
+      re = /((?:\\.|\#(?!\{)|[^#{quote}\\#])*)(#{quote}|#\{)/
       content = []
       loop do
         return false unless scanner.scan(re)
