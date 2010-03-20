@@ -190,6 +190,16 @@ That is, with the nested properties indented in the source.
 The Sass Rails plugin now works using Rack middleware by default
 in versions of Rails that support it (2.3 and onwards).
 
+### Firebug Support
+
+A new {file:SASS_REFERENCE.md#debug_info-option `:debug_info` option}
+has been added that emits line-number and filename information
+to the CSS file in a browser-readable format.
+This can be used with the new [FireSass Firebug extension](https://addons.mozilla.org/en-US/firefox/addon/103988)
+to report the Sass filename and line number for generated CSS files.
+
+This is also available via the `--debug-info` command-line flag.
+
 ### Sass::Plugin Callbacks
 
 {Sass::Plugin} now has a large collection of callbacks that allow users
@@ -230,7 +240,16 @@ Several bug fixes and minor improvements have been made, including:
   and `tealbang(12)` now renders as `tealbang(12)`
   rather than `teal bang(12)`.
 
-## 2.2.21 (Unreleased)
+## 2.2.22 (Unreleased)
+
+* Add a railtie so Haml and Sass will be automatically loaded in Rails 3.
+  Thanks to [Daniel Neighman](http://pancakestacks.wordpress.com/).
+
+* Make loading the gemspec not crash on read-only filesystems like Heroku's.
+
+## 2.2.21
+
+[Tagged on GitHub](http://github.com/nex3/haml/commit/2.2.21).
 
 * Fix a few bugs in the git-revision-reporting in {Haml::Version#version}.
   In particular, it will still work if `git gc` has been called recently,

@@ -90,7 +90,7 @@ end
 task :release_elpa do
   require 'tlsmail'
   require 'time'
-  require 'haml'
+  require scope('lib/haml')
 
   version = Haml.version[:number]
 
@@ -257,6 +257,7 @@ begin
     files = FileList.new(scope('doc-src/*')).to_a.sort_by {|s| s.size} + %w[MIT-LICENSE VERSION]
     t.options << '--files' << files.join(',')
     t.options << '--template-path' << scope('yard')
+    t.options << '--title' << ENV["YARD_TITLE"] if ENV["YARD_TITLE"]
   end
   Rake::Task['yard'].prerequisites.insert(0, 'yard:sass')
   Rake::Task['yard'].instance_variable_set('@comment', nil)
@@ -367,12 +368,12 @@ namespace :test do
   task :rails_compatibility do
     `rm -rf test/rails`
     puts "Checking out rails. Please wait."
-    system("git clone ~/code/rails test/rails") rescue nil
+    system("git clone git://github.com/rails/rails.git test/rails") rescue nil
     begin
       rails_versions.each {|version| test_rails_version version}
 
       puts "Checking out rails_xss. Please wait."
-      system("git clone ~/code/rails_xss test/plugins/rails_xss")
+      system("git clone git://github.com/NZKoz/rails_xss.git test/plugins/rails_xss")
       test_rails_version(rails_versions.find {|s| s =~ /^v2\.3/})
     ensure
       `rm -rf test/rails`

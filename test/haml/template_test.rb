@@ -70,8 +70,9 @@ class TemplateTest < Test::Unit::TestCase
     end
     
     if Haml::Util.has?(:private_method, base, :evaluate_assigns)
+      # Rails < 3.0
       base.send(:evaluate_assigns)
-    else
+    elsif Haml::Util.has?(:private_method, base, :_evaluate_assigns_and_ivars)
       # Rails 2.2
       base.send(:_evaluate_assigns_and_ivars)
     end
@@ -190,22 +191,24 @@ class TemplateTest < Test::Unit::TestCase
     assert_equal("2\n", render("= 1+1"))
   end
 
-  def test_form_for_error_return
-    assert_raise(Haml::Error) { render(<<HAML) }
+  unless Haml::Util.ap_geq_3?
+    def test_form_for_error_return
+      assert_raise(Haml::Error) { render(<<HAML) }
 = form_for :article, @article, :url => '' do |f|
   Title:
   = f.text_field :title
   Body:
   = f.text_field :body
 HAML
-  end
+    end
 
-  def test_form_tag_error_return
-    assert_raise(Haml::Error) { render(<<HAML) }
+    def test_form_tag_error_return
+      assert_raise(Haml::Error) { render(<<HAML) }
 = form_tag '' do
   Title:
   Body:
 HAML
+    end
   end
 
   def test_haml_options
@@ -228,10 +231,13 @@ baz
 HTML
 %p
   foo
-  - with_output_buffer do
+  -# Parenthesis required due to Rails 3.0 deprecation of block helpers
+  -# that return strings.
+  - (with_output_buffer do
     bar
     = "foo".gsub(/./) do |s|
       - "flup"
+  - end; nil)
   baz
 HAML
   end
@@ -264,6 +270,28 @@ END
       assert_match(/^\(haml\):5/, e.backtrace[0])
     else
       assert false
+    end
+  end
+
+  if defined?(ActionView::OutputBuffer) &&
+      Haml::Util.has?(:instance_method, ActionView::OutputBuffer, :append_if_string=)
+    def test_av_block_deprecation_warning
+      assert_warning(/^DEPRECATION WARNING: - style block helpers are deprecated\. Please use =\./) do
+        assert_equal <<HTML, render(<<HAML, :action_view)
+<form action="" method="post">
+  Title:
+  <input id="article_title" name="article[title]" size="30" type="text" value="Hello" />
+  Body:
+  <input id="article_body" name="article[body]" size="30" type="text" value="World" />
+</form>
+HTML
+- form_for :article, @article, :url => '' do |f|
+  Title:
+  = f.text_field :title
+  Body:
+  = f.text_field :body
+HAML
+      end
     end
   end
 
@@ -356,7 +384,7 @@ HAML
   <input id="article_body" name="article[body]" size="30" type="text" value="World" />
 </form>
 HTML
-- form_for :article, @article, :url => '' do |f|
+#{rails_block_helper_char} form_for :article, @article, :url => '' do |f|
   Title:
   = f.text_field :title
   Body:
